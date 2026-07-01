@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "@/lib/firebase";
 
 export default function SocialAuth() {
   const [error, setError] = useState("");
@@ -12,7 +11,10 @@ export default function SocialAuth() {
     setError("");
     setLoading(true);
     try {
-      await signInWithPopup(auth, googleProvider);
+      const { auth, googleProvider } = await import("@/lib/firebase");
+      if (auth && googleProvider) {
+        await signInWithPopup(auth, googleProvider);
+      }
     } catch (err: any) {
       setError(err.message || "Failed to sign in with Google");
     } finally {

@@ -5,7 +5,6 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 
 interface EmailAuthProps {
   mode: "login" | "signup";
@@ -34,6 +33,9 @@ export default function EmailAuth({ mode }: EmailAuthProps) {
 
     setLoading(true);
     try {
+      const { auth } = await import("@/lib/firebase");
+      if (!auth) return;
+
       if (mode === "login") {
         await signInWithEmailAndPassword(auth, email, password);
       } else {
