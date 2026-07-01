@@ -1,23 +1,16 @@
 "use client";
 
-import { useAuth } from "@/context/AuthContext";
-import LoginPage from "@/components/LoginPage";
-import Dashboard from "@/components/Dashboard";
+import dynamic from "next/dynamic";
+
+const AppContent = dynamic(() => import("@/components/AppContent"), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+  ),
+});
 
 export default function Home() {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (user) {
-    return <Dashboard />;
-  }
-
-  return <LoginPage />;
+  return <AppContent />;
 }
