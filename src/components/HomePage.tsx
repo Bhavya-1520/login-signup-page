@@ -7,42 +7,34 @@ interface HomePageProps {
 export default function HomePage({ onNavigate }: HomePageProps) {
   return (
     <div>
-      {/* Hero Section */}
-      <section className="relative overflow-hidden section-rose">
-        {/* Floating flowers decoration */}
-        <div className="absolute top-10 left-[5%] text-4xl animate-float opacity-40">🌸</div>
-        <div className="absolute top-20 right-[10%] text-3xl animate-float-slow opacity-30">🌹</div>
-        <div className="absolute bottom-20 left-[15%] text-2xl animate-float opacity-25">✿</div>
-        <div className="absolute bottom-10 right-[20%] text-4xl animate-float-slow opacity-30">🌷</div>
-        <div className="absolute top-40 left-[40%] text-2xl animate-float opacity-20">💮</div>
-        <div className="absolute top-10 right-[35%] text-3xl animate-float-slow opacity-25">🪻</div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-36 relative z-10">
+      {/* Hero Section - Big floral background */}
+      <section className="hero-floral relative min-h-[90vh] flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
           <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full text-sm text-[#C77DA5] font-medium mb-6 border border-pink-100">
-              <span>🌸</span> Handcrafted with Love
+            <div className="inline-flex items-center gap-2 glass-card px-5 py-2.5 rounded-full text-sm text-[#C77DA5] font-medium mb-8">
+              <span>🌸</span> Handcrafted with Love & Care
             </div>
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-7xl font-bold text-[#3D2B1F] leading-tight">
+            <h1 className="font-display text-5xl sm:text-6xl lg:text-8xl font-bold text-[#2C1810] leading-[1.1]">
               Bouquets That
               <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E8A0BF] to-[#C77DA5]">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E8A0BF] via-[#C77DA5] to-[#9B5DE5]">
                 Bloom Forever
               </span>
             </h1>
-            <p className="mt-6 text-lg sm:text-xl text-gray-600 leading-relaxed font-light max-w-2xl mx-auto">
+            <p className="mt-8 text-lg sm:text-xl text-gray-700 leading-relaxed max-w-2xl mx-auto">
               Exquisite handcrafted satin ribbon & pipe cleaner bouquets that capture eternal beauty.
-              The perfect gift that never wilts.
+              The perfect gift that never wilts, never fades.
             </p>
-            <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="mt-12 flex flex-col sm:flex-row gap-5 justify-center">
               <button
                 onClick={() => onNavigate("products")}
-                className="px-8 py-4 bg-gradient-to-r from-[#E8A0BF] to-[#C77DA5] text-white font-medium rounded-full hover:shadow-xl hover:shadow-pink-200/50 transition-all hover:-translate-y-0.5"
+                className="px-10 py-4 bg-gradient-to-r from-[#E8A0BF] to-[#9B5DE5] text-white font-semibold rounded-full hover:shadow-2xl hover:shadow-pink-300/40 transition-all hover:-translate-y-1 text-lg"
               >
-                Explore Collection
+                ✨ Explore Collection
               </button>
               <button
                 onClick={() => onNavigate("raksha-bandhan")}
-                className="px-8 py-4 bg-white/80 backdrop-blur-sm border-2 border-[#E8A0BF] text-[#C77DA5] font-medium rounded-full hover:bg-white hover:shadow-lg transition-all"
+                className="px-10 py-4 glass-card text-[#C77DA5] font-semibold rounded-full hover:shadow-xl transition-all hover:-translate-y-1 text-lg border-2 border-pink-200"
               >
                 🎀 Raksha Bandhan Special
               </button>
@@ -52,145 +44,159 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       </section>
 
       {/* Raksha Bandhan Banner */}
-      <section className="bg-gradient-to-r from-[#E8A0BF] via-[#D4A76A] to-[#E8A0BF] py-5 relative overflow-hidden">
+      <section className="bg-gradient-to-r from-[#9B5DE5] via-[#E8A0BF] to-[#F9A825] py-6 relative overflow-hidden">
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-1 left-[10%] text-white text-xl">✨</div>
-          <div className="absolute top-2 right-[15%] text-white text-lg">🎀</div>
-          <div className="absolute top-1 left-[50%] text-white text-xl">✨</div>
+          <div className="absolute top-1 left-[10%] text-2xl">✨</div>
+          <div className="absolute top-2 right-[15%] text-xl">🎀</div>
+          <div className="absolute top-1 left-[50%] text-2xl">✨</div>
+          <div className="absolute top-2 left-[75%] text-xl">🌸</div>
         </div>
         <div className="max-w-7xl mx-auto px-4 text-center relative z-10">
           <p className="text-white font-display text-xl sm:text-2xl font-semibold">
-            🎀 Raksha Bandhan Special — Combos starting at ₹499
+            🎀 Raksha Bandhan Special Combos — Starting at just ₹499!
           </p>
           <p className="text-white/80 text-sm mt-1">
-            Vintage Letter + Bouquet + Rakhi + Customized Gifts | Order before Aug 25th!
+            Vintage Letter + Bouquet + Rakhi + Gifts | Order before Aug 25th for guaranteed delivery
           </p>
+          <button
+            onClick={() => onNavigate("raksha-bandhan")}
+            className="mt-4 px-6 py-2.5 bg-white text-[#9B5DE5] font-semibold rounded-full text-sm hover:shadow-lg transition-all"
+          >
+            Shop Combos →
+          </button>
         </div>
       </section>
 
-      {/* Collections */}
-      <section className="py-20 sm:py-28">
+      {/* Collections - with floral background */}
+      <section className="section-floral-pink py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <p className="text-[#E8A0BF] font-medium tracking-wider uppercase text-sm mb-2">Our Collections</p>
-            <h2 className="font-display text-3xl sm:text-5xl font-bold text-[#3D2B1F]">
+          <div className="text-center mb-16">
+            <p className="text-[#9B5DE5] font-semibold tracking-wider uppercase text-sm mb-3">Our Collections</p>
+            <h2 className="font-display text-4xl sm:text-5xl font-bold text-[#2C1810]">
               Crafted with Passion
             </h2>
-            <p className="text-gray-500 mt-3 max-w-lg mx-auto">
+            <p className="text-gray-600 mt-4 max-w-lg mx-auto text-lg">
               Each piece is lovingly handmade, designed to bring joy that lasts a lifetime
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
             {/* Satin Ribbon */}
             <div
               onClick={() => onNavigate("products")}
-              className="group cursor-pointer glass-card rounded-3xl overflow-hidden hover:shadow-xl hover:shadow-pink-100/50 transition-all duration-500 hover:-translate-y-2"
+              className="group cursor-pointer glass-card rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-pink-200/40 transition-all duration-500 hover:-translate-y-3"
             >
-              <div className="aspect-[4/3] bg-gradient-to-br from-rose-100 via-pink-50 to-rose-100 flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%220%200%2040%2040%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%222%22%20fill%3D%22%23E8A0BF%22%20fill-opacity%3D%220.1%22%2F%3E%3C%2Fsvg%3E')] opacity-50"></div>
-                <span className="text-7xl group-hover:scale-125 transition-transform duration-500">🌹</span>
+              <div className="h-64 relative overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?w=600&q=80"
+                  alt="Satin Ribbon Bouquets"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
               </div>
-              <div className="p-6">
-                <h3 className="font-display text-xl font-semibold text-[#3D2B1F] group-hover:text-[#C77DA5] transition-colors">
+              <div className="p-7">
+                <h3 className="font-display text-xl font-bold text-[#2C1810] group-hover:text-[#C77DA5] transition-colors">
                   Satin Ribbon Bouquets
                 </h3>
                 <p className="text-gray-500 text-sm mt-2">
                   Elegant roses crafted from luxurious satin ribbons
                 </p>
-                <p className="text-[#E8A0BF] font-semibold mt-3">Starting at ₹199</p>
+                <p className="text-[#9B5DE5] font-bold mt-3 text-lg">Starting at ₹199</p>
               </div>
             </div>
 
             {/* Pipe Cleaner */}
             <div
               onClick={() => onNavigate("products")}
-              className="group cursor-pointer glass-card rounded-3xl overflow-hidden hover:shadow-xl hover:shadow-purple-100/50 transition-all duration-500 hover:-translate-y-2"
+              className="group cursor-pointer glass-card rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-purple-200/40 transition-all duration-500 hover:-translate-y-3"
             >
-              <div className="aspect-[4/3] bg-gradient-to-br from-purple-50 via-violet-50 to-fuchsia-50 flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%220%200%2040%2040%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%222%22%20fill%3D%22%23A78BFA%22%20fill-opacity%3D%220.1%22%2F%3E%3C%2Fsvg%3E')] opacity-50"></div>
-                <span className="text-7xl group-hover:scale-125 transition-transform duration-500">💐</span>
+              <div className="h-64 relative overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1567696911980-2eed69a46042?w=600&q=80"
+                  alt="Pipe Cleaner Bouquets"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
               </div>
-              <div className="p-6">
-                <h3 className="font-display text-xl font-semibold text-[#3D2B1F] group-hover:text-[#C77DA5] transition-colors">
+              <div className="p-7">
+                <h3 className="font-display text-xl font-bold text-[#2C1810] group-hover:text-[#C77DA5] transition-colors">
                   Pipe Cleaner Bouquets
                 </h3>
                 <p className="text-gray-500 text-sm mt-2">
                   Vibrant, colorful flowers in any shade you desire
                 </p>
-                <p className="text-[#E8A0BF] font-semibold mt-3">Starting at ₹99</p>
+                <p className="text-[#9B5DE5] font-bold mt-3 text-lg">Starting at ₹99</p>
               </div>
             </div>
 
             {/* Gifts & Combos */}
             <div
               onClick={() => onNavigate("raksha-bandhan")}
-              className="group cursor-pointer glass-card rounded-3xl overflow-hidden hover:shadow-xl hover:shadow-amber-100/50 transition-all duration-500 hover:-translate-y-2"
+              className="group cursor-pointer glass-card rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-amber-200/40 transition-all duration-500 hover:-translate-y-3"
             >
-              <div className="aspect-[4/3] bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%220%200%2040%2040%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%222%22%20fill%3D%22%23D4A76A%22%20fill-opacity%3D%220.1%22%2F%3E%3C%2Fsvg%3E')] opacity-50"></div>
-                <span className="text-7xl group-hover:scale-125 transition-transform duration-500">🎁</span>
+              <div className="h-64 relative overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1549488344-cbb6c34cf08b?w=600&q=80"
+                  alt="Gifts and Combos"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
               </div>
-              <div className="p-6">
-                <h3 className="font-display text-xl font-semibold text-[#3D2B1F] group-hover:text-[#C77DA5] transition-colors">
-                  Gifts & Combos
+              <div className="p-7">
+                <h3 className="font-display text-xl font-bold text-[#2C1810] group-hover:text-[#C77DA5] transition-colors">
+                  Gifts & Festival Combos
                 </h3>
                 <p className="text-gray-500 text-sm mt-2">
-                  Magnets, pots, portraits & festival specials
+                  Magnets, pots, portraits & Raksha Bandhan specials
                 </p>
-                <p className="text-[#E8A0BF] font-semibold mt-3">Starting at ₹149</p>
+                <p className="text-[#9B5DE5] font-bold mt-3 text-lg">Starting at ₹149</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Why Choose Us */}
-      <section className="py-20 section-sage relative overflow-hidden">
-        <div className="absolute top-5 right-[5%] text-3xl opacity-20 animate-float">🍃</div>
-        <div className="absolute bottom-5 left-[5%] text-2xl opacity-20 animate-float-slow">🌿</div>
-
+      {/* Why Choose Us - garden background */}
+      <section className="section-floral-garden py-24 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-14">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#3D2B1F]">
-              Why Choose Loom & Bloom?
+          <div className="text-center mb-16">
+            <h2 className="font-display text-4xl sm:text-5xl font-bold text-[#2C1810]">
+              Why Loom & Bloom?
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            <div className="text-center glass-card rounded-3xl p-8">
-              <div className="text-5xl mb-4">♾️</div>
-              <h3 className="font-display text-lg font-semibold text-[#3D2B1F] mb-2">Everlasting Beauty</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">Our bouquets stay beautiful forever — no watering, no wilting, just eternal charm</p>
+            <div className="text-center glass-card rounded-3xl p-10 hover:shadow-xl transition-all hover:-translate-y-1">
+              <div className="text-6xl mb-5">♾️</div>
+              <h3 className="font-display text-xl font-bold text-[#2C1810] mb-3">Everlasting Beauty</h3>
+              <p className="text-gray-500 leading-relaxed">Our bouquets stay beautiful forever. No watering, no wilting — just eternal charm and color.</p>
             </div>
-            <div className="text-center glass-card rounded-3xl p-8">
-              <div className="text-5xl mb-4">🎨</div>
-              <h3 className="font-display text-lg font-semibold text-[#3D2B1F] mb-2">Your Colors, Your Way</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">Complete customization — choose any color, any size, any style you dream of</p>
+            <div className="text-center glass-card rounded-3xl p-10 hover:shadow-xl transition-all hover:-translate-y-1">
+              <div className="text-6xl mb-5">🎨</div>
+              <h3 className="font-display text-xl font-bold text-[#2C1810] mb-3">Your Colors, Your Way</h3>
+              <p className="text-gray-500 leading-relaxed">Complete customization — any color, any size, any style. We make your dream bouquet a reality.</p>
             </div>
-            <div className="text-center glass-card rounded-3xl p-8">
-              <div className="text-5xl mb-4">💝</div>
-              <h3 className="font-display text-lg font-semibold text-[#3D2B1F] mb-2">Made with Love</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">Every single flower is handcrafted with care and attention to the smallest details</p>
+            <div className="text-center glass-card rounded-3xl p-10 hover:shadow-xl transition-all hover:-translate-y-1">
+              <div className="text-6xl mb-5">💝</div>
+              <h3 className="font-display text-xl font-bold text-[#2C1810] mb-3">Made with Love</h3>
+              <p className="text-gray-500 leading-relaxed">Every flower is handcrafted with passion and care. Each piece tells a story of dedication.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Instagram CTA */}
-      <section className="py-20">
+      {/* Instagram CTA - wildflower background */}
+      <section className="section-floral-wild py-24">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="glass-card rounded-3xl p-10 sm:p-14 relative overflow-hidden">
-            <div className="absolute top-4 left-4 text-3xl opacity-20">🌸</div>
-            <div className="absolute bottom-4 right-4 text-3xl opacity-20">🌷</div>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#3D2B1F] mb-4">
-              Follow Our Journey
+          <div className="glass-card rounded-3xl p-12 sm:p-16">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#2C1810] mb-4">
+              Follow Our Journey 📸
             </h2>
-            <p className="text-gray-500 mb-6">See our latest creations and behind-the-scenes on Instagram</p>
+            <p className="text-gray-600 mb-8 text-lg">See our latest creations and behind-the-scenes magic</p>
             <a
               href="https://instagram.com/loomandbloom.studio"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-medium rounded-full hover:shadow-xl transition-all"
+              className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-semibold rounded-full hover:shadow-2xl transition-all text-lg hover:-translate-y-1"
             >
               📸 @loomandbloom.studio
             </a>
@@ -199,41 +205,40 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#3D2B1F] text-white py-14 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#E8A0BF] via-[#D4A76A] to-[#A8C5A0]"></div>
+      <footer className="footer-floral text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-12">
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-2xl">🌸</span>
-                <span className="font-display text-xl font-bold text-[#E8A0BF]">Loom & Bloom Studio</span>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-3xl">🌸</span>
+                <span className="font-display text-2xl font-bold text-[#E8A0BF]">Loom & Bloom</span>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-gray-300 leading-relaxed">
                 Handcrafted permanent bouquets that capture beauty and preserve memories forever.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-[#D4A76A]">Quick Links</h4>
-              <div className="space-y-2.5 text-sm text-gray-400">
-                <button onClick={() => onNavigate("products")} className="block hover:text-[#E8A0BF] transition-colors">Shop All</button>
-                <button onClick={() => onNavigate("raksha-bandhan")} className="block hover:text-[#E8A0BF] transition-colors">Raksha Bandhan</button>
-                <button onClick={() => onNavigate("about")} className="block hover:text-[#E8A0BF] transition-colors">About Us</button>
-                <button onClick={() => onNavigate("contact")} className="block hover:text-[#E8A0BF] transition-colors">Contact</button>
+              <h4 className="font-semibold mb-5 text-[#E8A0BF] text-lg">Quick Links</h4>
+              <div className="space-y-3 text-gray-300">
+                <button onClick={() => onNavigate("products")} className="block hover:text-white transition-colors">Shop All</button>
+                <button onClick={() => onNavigate("raksha-bandhan")} className="block hover:text-white transition-colors">Raksha Bandhan</button>
+                <button onClick={() => onNavigate("about")} className="block hover:text-white transition-colors">About Us</button>
+                <button onClick={() => onNavigate("contact")} className="block hover:text-white transition-colors">Contact</button>
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-[#D4A76A]">Connect With Us</h4>
-              <div className="space-y-2.5 text-sm text-gray-400">
-                <a href="https://instagram.com/loomandbloom.studio" target="_blank" rel="noopener noreferrer" className="block hover:text-[#E8A0BF] transition-colors">
+              <h4 className="font-semibold mb-5 text-[#E8A0BF] text-lg">Connect With Us</h4>
+              <div className="space-y-3 text-gray-300">
+                <a href="https://instagram.com/loomandbloom.studio" target="_blank" rel="noopener noreferrer" className="block hover:text-white transition-colors">
                   📸 @loomandbloom.studio
                 </a>
-                <a href="https://wa.me/919346630240" target="_blank" rel="noopener noreferrer" className="block hover:text-[#E8A0BF] transition-colors">
-                  💬 +91 9346630240
+                <a href="https://wa.me/919346630240" target="_blank" rel="noopener noreferrer" className="block hover:text-white transition-colors">
+                  💬 WhatsApp: +91 9346630240
                 </a>
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-10 pt-8 text-center text-sm text-gray-500">
+          <div className="border-t border-white/10 mt-12 pt-8 text-center text-gray-400">
             © 2026 Loom & Bloom Studio. Made with 🌸 and love.
           </div>
         </div>
