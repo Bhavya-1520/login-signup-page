@@ -7,12 +7,10 @@ import Dashboard from "@/components/Dashboard";
 function AuthSwitch() {
   const { user, loading } = useAuth();
 
+  // Show the login page immediately while checking auth status
+  // This prevents the blank loading screen
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <LoginPage />;
   }
 
   if (user) {
