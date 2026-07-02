@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Auth App - Login & Signup",
-  description: "Login and Signup with Email and Google",
+  title: "Loom & Bloom Studio | Handcrafted Permanent Bouquets",
+  description: "Beautiful handcrafted satin ribbon and pipe cleaner bouquets that last forever. Perfect gifts for every occasion.",
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gray-50">
+      <body className="min-h-screen bg-[#FDF8F4]">
         {children}
       </body>
     </html>

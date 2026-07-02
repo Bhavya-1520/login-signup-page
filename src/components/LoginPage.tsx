@@ -10,22 +10,22 @@ export default function LoginPage() {
   const [mode, setMode] = useState<AuthMode>("login");
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            {mode === "login" ? "Welcome back" : "Create account"}
+          <h1 className="font-display text-3xl font-bold text-[#2C1810]">
+            {mode === "login" ? "Welcome back" : "Join Loom & Bloom"}
           </h1>
           <p className="text-gray-600 mt-2">
             {mode === "login"
               ? "Sign in to your account"
-              : "Sign up to get started"}
+              : "Create an account to start ordering"}
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="bg-white rounded-2xl shadow-sm p-8">
           {/* Email/Password Form */}
           <EmailAuth mode={mode} />
 
@@ -50,7 +50,7 @@ export default function LoginPage() {
               Don&apos;t have an account?{" "}
               <button
                 onClick={() => setMode("signup")}
-                className="text-blue-600 font-medium hover:underline"
+                className="text-[#8B5E3C] font-medium hover:underline"
               >
                 Sign up
               </button>
@@ -60,7 +60,7 @@ export default function LoginPage() {
               Already have an account?{" "}
               <button
                 onClick={() => setMode("login")}
-                className="text-blue-600 font-medium hover:underline"
+                className="text-[#8B5E3C] font-medium hover:underline"
               >
                 Sign in
               </button>
