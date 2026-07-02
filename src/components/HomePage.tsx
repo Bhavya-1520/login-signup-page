@@ -1,5 +1,7 @@
 "use client";
 
+import HeroCarousel from "./HeroCarousel";
+
 interface HomePageProps {
   onNavigate: (page: string) => void;
 }
@@ -7,41 +9,8 @@ interface HomePageProps {
 export default function HomePage({ onNavigate }: HomePageProps) {
   return (
     <div>
-      {/* Hero Section - Big floral background */}
-      <section className="hero-floral relative min-h-[90vh] flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
-          <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 glass-card px-5 py-2.5 rounded-full text-sm text-[#C77DA5] font-medium mb-8">
-              <span>🌸</span> Handcrafted with Love & Care
-            </div>
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-8xl font-bold text-[#2C1810] leading-[1.1]">
-              Bouquets That
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E8A0BF] via-[#C77DA5] to-[#9B5DE5]">
-                Bloom Forever
-              </span>
-            </h1>
-            <p className="mt-8 text-lg sm:text-xl text-gray-700 leading-relaxed max-w-2xl mx-auto">
-              Exquisite handcrafted satin ribbon & pipe cleaner bouquets that capture eternal beauty.
-              The perfect gift that never wilts, never fades.
-            </p>
-            <div className="mt-12 flex flex-col sm:flex-row gap-5 justify-center">
-              <button
-                onClick={() => onNavigate("products")}
-                className="px-10 py-4 bg-gradient-to-r from-[#E8A0BF] to-[#9B5DE5] text-white font-semibold rounded-full hover:shadow-2xl hover:shadow-pink-300/40 transition-all hover:-translate-y-1 text-lg"
-              >
-                ✨ Explore Collection
-              </button>
-              <button
-                onClick={() => onNavigate("raksha-bandhan")}
-                className="px-10 py-4 glass-card text-[#C77DA5] font-semibold rounded-full hover:shadow-xl transition-all hover:-translate-y-1 text-lg border-2 border-pink-200"
-              >
-                🎀 Raksha Bandhan Special
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero Carousel */}
+      <HeroCarousel onNavigate={onNavigate} />
 
       {/* Raksha Bandhan Banner */}
       <section className="bg-gradient-to-r from-[#9B5DE5] via-[#E8A0BF] to-[#F9A825] py-6 relative overflow-hidden">
