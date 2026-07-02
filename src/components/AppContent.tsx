@@ -1,10 +1,10 @@
 "use client";
 
-import { useAuth } from "@/context/AuthContext";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 import LoginPage from "@/components/LoginPage";
 import Dashboard from "@/components/Dashboard";
 
-export default function AppContent() {
+function AuthSwitch() {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -20,4 +20,12 @@ export default function AppContent() {
   }
 
   return <LoginPage />;
+}
+
+export default function AppContent() {
+  return (
+    <AuthProvider>
+      <AuthSwitch />
+    </AuthProvider>
+  );
 }
