@@ -20,23 +20,24 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
-      <div className="text-center mb-10">
-        <h1 className="font-display text-3xl sm:text-4xl font-bold text-[#2C1810]">
-          Our Products
+      <div className="text-center mb-12">
+        <p className="text-[#E8A0BF] font-medium tracking-wider uppercase text-sm mb-2">Shop</p>
+        <h1 className="font-display text-3xl sm:text-5xl font-bold text-[#3D2B1F]">
+          Our Collection
         </h1>
-        <p className="text-gray-600 mt-2">Find the perfect handcrafted gift</p>
+        <p className="text-gray-500 mt-3">Find the perfect handcrafted gift for your loved ones</p>
       </div>
 
       {/* Category Filters */}
-      <div className="flex flex-wrap justify-center gap-3 mb-10">
+      <div className="flex flex-wrap justify-center gap-3 mb-12">
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
-            className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+            className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
               selectedCategory === cat
-                ? "bg-[#8B5E3C] text-white shadow-md"
-                : "bg-white text-gray-600 hover:bg-[#F5E6D3] border border-gray-200"
+                ? "bg-gradient-to-r from-[#E8A0BF] to-[#C77DA5] text-white shadow-lg shadow-pink-200/40"
+                : "glass-card text-gray-600 hover:text-[#C77DA5] hover:border-pink-200"
             }`}
           >
             {cat}

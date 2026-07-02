@@ -23,7 +23,7 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
     return (
       <div className="max-w-7xl mx-auto px-4 py-12 text-center">
         <p className="text-gray-600">Product not found</p>
-        <button onClick={() => onNavigate("products")} className="mt-4 text-[#8B5E3C] font-medium">
+        <button onClick={() => onNavigate("products")} className="mt-4 text-[#C77DA5] font-medium">
           ← Back to Shop
         </button>
       </div>
@@ -60,18 +60,19 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Back button */}
       <button
         onClick={() => onNavigate("products")}
-        className="text-[#8B5E3C] font-medium mb-8 flex items-center gap-2 hover:gap-3 transition-all"
+        className="text-[#C77DA5] font-medium mb-8 flex items-center gap-2 hover:gap-3 transition-all"
       >
         ← Back to Shop
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Product Image */}
-        <div className="aspect-square bg-gradient-to-br from-[#F5E6D3] to-[#FDF8F4] rounded-3xl flex items-center justify-center">
-          <span className="text-9xl">
+        <div className="aspect-square bg-gradient-to-br from-rose-50 via-pink-50 to-fuchsia-50 rounded-3xl flex items-center justify-center relative overflow-hidden glass-card">
+          <div className="absolute top-6 left-6 text-2xl opacity-30 animate-float">🌸</div>
+          <div className="absolute bottom-6 right-6 text-2xl opacity-30 animate-float-slow">✿</div>
+          <span className="text-[120px] sm:text-[150px]">
             {productId === "satin-ribbon-bouquet" && "🌹"}
             {productId === "pipe-cleaner-bouquet" && "💐"}
             {productId === "fridge-magnets" && "🧲"}
@@ -84,111 +85,103 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
 
         {/* Product Info */}
         <div>
-          <div className="text-sm text-[#D4A574] font-medium uppercase tracking-wider mb-2">
+          <div className="text-sm text-[#E8A0BF] font-medium uppercase tracking-wider mb-2">
             {product.category}
           </div>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-[#2C1810]">
+          <h1 className="font-display text-3xl sm:text-4xl font-bold text-[#3D2B1F]">
             {product.name}
           </h1>
-          <p className="text-gray-600 mt-4 leading-relaxed">{product.description}</p>
+          <p className="text-gray-500 mt-4 leading-relaxed">{product.description}</p>
 
           <div className="mt-8 space-y-6">
-            {/* Size selector (for pipe cleaner) */}
+            {/* Size selector */}
             {product.sizes && (
               <div>
-                <label className="block text-sm font-medium text-[#2C1810] mb-3">
-                  Select Size
-                </label>
+                <label className="block text-sm font-medium text-[#3D2B1F] mb-3">Select Size</label>
                 <div className="flex flex-wrap gap-3">
                   {product.sizes.map((size) => (
                     <button
                       key={size.label}
                       onClick={() => setSelectedSize(size.label)}
-                      className={`px-5 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
+                      className={`px-5 py-3 rounded-2xl text-sm font-medium transition-all ${
                         selectedSize === size.label
-                          ? "border-[#8B5E3C] bg-[#F5E6D3] text-[#8B5E3C]"
-                          : "border-gray-200 text-gray-600 hover:border-[#D4A574]"
+                          ? "bg-gradient-to-r from-[#E8A0BF] to-[#C77DA5] text-white shadow-lg shadow-pink-200/40"
+                          : "glass-card text-gray-600 hover:border-pink-200"
                       }`}
                     >
-                      {size.label} ({size.flowers} flowers) — ₹{size.price}
+                      {size.label} ({size.flowers}) — ₹{size.price}
                     </button>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Flower count (for satin ribbon) */}
+            {/* Flower count */}
             {product.pricePerExtra && (
               <div>
-                <label className="block text-sm font-medium text-[#2C1810] mb-3">
-                  Number of Flowers
-                </label>
+                <label className="block text-sm font-medium text-[#3D2B1F] mb-3">Number of Flowers</label>
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => setFlowerCount(Math.max(1, flowerCount - 1))}
-                    className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-lg hover:border-[#8B5E3C] transition-colors"
+                    className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-lg hover:border-pink-300 transition-colors font-medium"
                   >
                     −
                   </button>
-                  <span className="text-2xl font-bold text-[#2C1810] w-8 text-center">
+                  <span className="text-3xl font-bold text-[#3D2B1F] w-10 text-center font-display">
                     {flowerCount}
                   </span>
                   <button
                     onClick={() => setFlowerCount(flowerCount + 1)}
-                    className="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-lg hover:border-[#8B5E3C] transition-colors"
+                    className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-lg hover:border-pink-300 transition-colors font-medium"
                   >
                     +
                   </button>
                 </div>
-                <p className="text-sm text-gray-500 mt-2">
-                  1 flower = ₹199, each additional flower +₹100
+                <p className="text-sm text-gray-400 mt-2">
+                  1 flower = ₹199, each additional +₹100
                 </p>
               </div>
             )}
 
             {/* Color preference */}
             <div>
-              <label className="block text-sm font-medium text-[#2C1810] mb-2">
-                Color Preference
-              </label>
+              <label className="block text-sm font-medium text-[#3D2B1F] mb-2">Color Preference</label>
               <input
                 type="text"
                 value={colors}
                 onChange={(e) => setColors(e.target.value)}
-                placeholder="e.g., Red, Pink, Yellow (any color you want!)"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#D4A574] focus:border-transparent outline-none text-gray-900"
+                placeholder="e.g., Red, Pink, Lavender (any color!)"
+                className="w-full px-4 py-3 glass-card rounded-2xl focus:ring-2 focus:ring-[#E8A0BF] focus:border-transparent outline-none text-gray-900"
               />
             </div>
 
             {/* Custom note */}
             <div>
-              <label className="block text-sm font-medium text-[#2C1810] mb-2">
-                Special Instructions (optional)
-              </label>
+              <label className="block text-sm font-medium text-[#3D2B1F] mb-2">Special Instructions (optional)</label>
               <textarea
                 value={customNote}
                 onChange={(e) => setCustomNote(e.target.value)}
-                placeholder="Any specific design requests, message to include, etc."
+                placeholder="Any specific design requests..."
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#D4A574] focus:border-transparent outline-none resize-none text-gray-900"
+                className="w-full px-4 py-3 glass-card rounded-2xl focus:ring-2 focus:ring-[#E8A0BF] focus:border-transparent outline-none resize-none text-gray-900"
               />
             </div>
 
             {/* Price & Add to Cart */}
-            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+            <div className="flex items-center justify-between pt-6 border-t border-pink-100">
               <div>
-                <p className="text-sm text-gray-500">Total Price</p>
-                <p className="text-3xl font-bold text-[#8B5E3C]">₹{calculatePrice()}</p>
+                <p className="text-sm text-gray-400">Total Price</p>
+                <p className="text-3xl font-bold text-[#C77DA5] font-display">₹{calculatePrice()}</p>
               </div>
               <button
                 onClick={handleAddToCart}
                 className={`px-8 py-4 rounded-full font-medium text-white transition-all ${
                   added
-                    ? "bg-green-500"
-                    : "bg-[#8B5E3C] hover:bg-[#6B4A2E] shadow-lg hover:shadow-xl"
-                }`}
+                    ? "bg-green-400 shadow-green-200/50"
+                    : "bg-gradient-to-r from-[#E8A0BF] to-[#C77DA5] hover:shadow-xl hover:shadow-pink-200/50 hover:-translate-y-0.5"
+                } shadow-lg`}
               >
-                {added ? "✓ Added to Cart" : "Add to Cart"}
+                {added ? "✓ Added!" : "Add to Cart 🛒"}
               </button>
             </div>
           </div>
