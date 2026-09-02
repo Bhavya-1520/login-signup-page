@@ -19,7 +19,7 @@ export default function CartPage({ onNavigate }: CartPageProps) {
         <p className="text-gray-500 mb-8">Add some beautiful bouquets to get started!</p>
         <button
           onClick={() => onNavigate("products")}
-          className="px-8 py-3 bg-gradient-to-r from-[#E8A0BF] to-[#C77DA5] text-white font-medium rounded-full hover:shadow-xl hover:shadow-pink-200/50 transition-all"
+          className="px-8 py-3 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white font-medium rounded-full hover:shadow-xl hover:shadow-pink-200/50 transition-all"
         >
           Browse Collection
         </button>
@@ -76,7 +76,7 @@ export default function CartPage({ onNavigate }: CartPageProps) {
         <div className="flex flex-col sm:flex-row gap-4">
           <button
             onClick={() => onNavigate("checkout")}
-            className="flex-1 py-4 bg-gradient-to-r from-[#E8A0BF] to-[#C77DA5] text-white font-medium rounded-full hover:shadow-xl hover:shadow-pink-200/50 transition-all text-lg"
+            className="flex-1 py-4 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white font-medium rounded-full hover:shadow-xl hover:shadow-pink-200/50 transition-all text-lg"
           >
             Checkout — ₹{totalPrice}
           </button>

@@ -1,12 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+:root {
+  /* Pastel Sky Blue + Light Pink palette */
+  --sky: #B8DEF0;
+  --sky-light: #E3F4FC;
+  --sky-dark: #7FC4E0;
+  --pink: #F8C8DC;
+  --pink-light: #FDE8F0;
+  --pink-dark: #E8A0BF;
+  --accent: #89C4E1;
+  --accent-dark: #5EAED4;
+  --text-dark: #2C3E50;
+  --text-muted: #5D7A8C;
+}
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #E8F4FD;
+  background: linear-gradient(180deg, #F0F9FF 0%, #FDF2F8 50%, #F0F9FF 100%);
+  min-height: 100vh;
 }
 
 .font-display {
@@ -17,12 +32,12 @@ body {
   font-family: 'Cormorant Garamond', serif;
 }
 
-/* Glass card effect */
+/* Glass card effect - softer with pastel tint */
 .glass-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(184, 222, 240, 0.3);
+  box-shadow: 0 4px 30px rgba(137, 196, 225, 0.08);
 }
 
 /* Floating animations */
@@ -44,19 +59,16 @@ body {
   animation: float-slow 6s ease-in-out infinite;
 }
 
-/* Hero background with real floral image */
+/* Hero background - pastel sky blue + pink */
 .hero-floral {
   background: 
-    linear-gradient(135deg, rgba(200, 230, 250, 0.85) 0%, rgba(232, 244, 253, 0.75) 50%, rgba(255, 240, 245, 0.8) 100%),
-    url('https://images.unsplash.com/photo-1490750967868-88aa4f44b3da?w=1920&q=80');
-  background-size: cover;
-  background-position: center;
+    linear-gradient(135deg, rgba(184, 222, 240, 0.4) 0%, rgba(240, 249, 255, 0.6) 40%, rgba(248, 200, 220, 0.3) 100%);
 }
 
 /* Section with floral background - pink roses */
 .section-floral-pink {
   background: 
-    linear-gradient(to bottom, rgba(232, 244, 253, 0.9), rgba(255, 240, 250, 0.88)),
+    linear-gradient(to bottom, rgba(240, 249, 255, 0.92), rgba(253, 242, 248, 0.9)),
     url('https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=1920&q=80');
   background-size: cover;
   background-position: center;
@@ -65,31 +77,21 @@ body {
 /* Section with floral background - wildflowers */
 .section-floral-wild {
   background: 
-    linear-gradient(to bottom, rgba(232, 244, 253, 0.88), rgba(240, 248, 255, 0.9)),
-    url('https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=1920&q=80');
-  background-size: cover;
-  background-position: center;
+    linear-gradient(to bottom, rgba(240, 249, 255, 0.9), rgba(248, 200, 220, 0.15));
 }
 
 /* Section with floral background - garden */
 .section-floral-garden {
   background: 
-    linear-gradient(135deg, rgba(232, 244, 253, 0.85), rgba(240, 255, 244, 0.88)),
-    url('https://images.unsplash.com/photo-1508610048659-a06b669e3321?w=1920&q=80');
-  background-size: cover;
-  background-position: center;
+    linear-gradient(135deg, rgba(240, 249, 255, 0.9), rgba(248, 200, 220, 0.2));
 }
 
 /* Products section background */
 .section-sky {
-  background: linear-gradient(180deg, #E8F4FD 0%, #F0F8FF 50%, #FFF5FA 100%);
+  background: linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 50%, #FDF2F8 100%);
 }
 
-/* Footer floral */
+/* Footer */
 .footer-floral {
-  background:
-    linear-gradient(to top, rgba(30, 20, 15, 0.97), rgba(50, 35, 25, 0.92)),
-    url('https://images.unsplash.com/photo-1490750967868-88aa4f44b3da?w=1920&q=80');
-  background-size: cover;
-  background-position: center;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
 }

@@ -23,6 +23,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Dynamic import to avoid server-side execution
     import("@/lib/firebase").then(({ auth }) => {
       if (auth) {
+        // Sign out on every fresh page load (no persistent sessions)
+        const isNewSession = !sessionStorage.getItem("session_active");
+        if (isNewSession) {
+          signOut(auth).then(() => {
+            sessionStorage.setItem("session_active", "true");
+          });
+        }
+
         const unsubscribe = onAuthStateChanged(auth, (user) => {
           setUser(user);
           setLoading(false);

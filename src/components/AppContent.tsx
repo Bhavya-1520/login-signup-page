@@ -12,6 +12,12 @@ import CheckoutPage from "./CheckoutPage";
 import LoginPage from "./LoginPage";
 import AboutPage from "./AboutPage";
 import ContactPage from "./ContactPage";
+import OrdersPage from "./OrdersPage";
+import ManagerDashboard from "./ManagerDashboard";
+import AccountPage from "./AccountPage";
+import AddressesPage from "./AddressesPage";
+import SettingsPage from "./SettingsPage";
+import SearchResultsPage from "./SearchResultsPage";
 
 export default function AppContent() {
   const [currentPage, setCurrentPage] = useState("home");
@@ -27,6 +33,11 @@ export default function AppContent() {
       return <ProductDetail productId={productId} onNavigate={handleNavigate} />;
     }
 
+    if (currentPage.startsWith("search-")) {
+      const query = decodeURIComponent(currentPage.replace("search-", ""));
+      return <SearchResultsPage query={query} onNavigate={handleNavigate} />;
+    }
+
     switch (currentPage) {
       case "home":
         return <HomePage onNavigate={handleNavigate} />;
@@ -39,7 +50,17 @@ export default function AppContent() {
       case "checkout":
         return <CheckoutPage onNavigate={handleNavigate} />;
       case "login":
-        return <LoginPage />;
+        return <LoginPage onNavigate={handleNavigate} />;
+      case "orders":
+        return <OrdersPage onNavigate={handleNavigate} />;
+      case "manager":
+        return <ManagerDashboard onNavigate={handleNavigate} />;
+      case "account":
+        return <AccountPage onNavigate={handleNavigate} />;
+      case "addresses":
+        return <AddressesPage onNavigate={handleNavigate} />;
+      case "settings":
+        return <SettingsPage onNavigate={handleNavigate} />;
       case "about":
         return <AboutPage />;
       case "contact":
