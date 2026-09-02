@@ -45,6 +45,7 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
   const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0]?.label || "");
   const [selectedVariant, setSelectedVariant] = useState(product?.variants?.[0]?.label || "");
   const [flowerCount, setFlowerCount] = useState(1);
+  const [quantity, setQuantity] = useState(1);
   const [colors, setColors] = useState("");
   const [customNote, setCustomNote] = useState("");
   const [currentImage, setCurrentImage] = useState(0);
@@ -79,13 +80,19 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
 
   const addToCart = () => {
     const cartItemId = `${product.id}-${selectedSize}-${flowerCount}-${Date.now()}`;
+    // Build a clear size/detail label
+    const sizeParts = [];
+    if (selectedVariant) sizeParts.push(selectedVariant);
+    if (selectedSize) sizeParts.push(selectedSize);
+    else if (product.pricePerExtra) sizeParts.push(`Flowers: ${flowerCount}`);
+
     addItem({
       id: cartItemId,
       productId: product.id,
       name: product.name,
       price: calculatePrice(),
-      quantity: 1,
-      size: [selectedVariant, selectedSize || `${flowerCount} flower(s)`].filter(Boolean).join(" • "),
+      quantity: quantity,
+      size: sizeParts.join(" • "),
       colors: colors,
       customNote: customNote,
       image: product.image,
@@ -295,10 +302,35 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
               />
             </div>
 
+            {/* Quantity selector */}
+            <div>
+              <label className="block text-sm font-medium text-[#3D2B1F] mb-3">Quantity</label>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-lg hover:border-sky-300 transition-colors font-medium"
+                >
+                  −
+                </button>
+                <span className="text-2xl font-bold text-[#3D2B1F] w-10 text-center font-display">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-lg hover:border-sky-300 transition-colors font-medium"
+                >
+                  +
+                </button>
+                <span className="text-sm text-gray-400">
+                  {quantity > 1 ? `${quantity} pieces` : "piece"}
+                </span>
+              </div>
+            </div>
+
             {/* Price */}
             <div className="pt-6 border-t border-pink-100">
-              <p className="text-sm text-gray-400">Total Price</p>
-              <p className="text-3xl font-bold text-[#5EAED4] font-display">₹{calculatePrice()}</p>
+              <p className="text-sm text-gray-400">Total Price {quantity > 1 && `(${quantity} × ₹${calculatePrice()})`}</p>
+              <p className="text-3xl font-bold text-[#5EAED4] font-display">₹{calculatePrice() * quantity}</p>
             </div>
 
             {/* Buy Now & Add to Cart buttons */}

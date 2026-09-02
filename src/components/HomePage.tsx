@@ -241,9 +241,10 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               href="https://www.instagram.com/the_house_of_gnapakam?igsh=aXYwaDdnMXphNzF2"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-semibold rounded-full hover:shadow-2xl transition-all text-lg hover:-translate-y-1"
+              className="inline-flex items-center justify-center gap-2 max-w-full px-5 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-semibold rounded-full hover:shadow-2xl transition-all text-sm sm:text-lg hover:-translate-y-1 break-all"
             >
-              📸 @the_house_of_gnapakam
+              <span className="flex-shrink-0">📸</span>
+              <span className="truncate">@the_house_of_gnapakam</span>
             </a>
           </div>
         </div>

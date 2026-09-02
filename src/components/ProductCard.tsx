@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { products as fallbackProducts } from "@/lib/products";
+import { useCart } from "@/context/CartContext";
 
 interface ProductCardProps {
   product: {
@@ -28,11 +29,15 @@ const productEmojis: Record<string, string> = {
 };
 
 export default function ProductCard({ product, onNavigate }: ProductCardProps) {
+  const { items } = useCart();
   // Get images from product or fallback
   const fallback = fallbackProducts.find((p) => p.id === product.id);
   const images = product.images || fallback?.images || (product.image ? [product.image] : []);
   const hasImage = images.length > 0 && !images[0].includes("placeholder");
   const emoji = productEmojis[product.id] || "🌸";
+
+  // Check if this product is in the cart
+  const inCart = items.some((item) => item.productId === product.id);
 
   const [currentImg, setCurrentImg] = useState(0);
 
@@ -101,6 +106,11 @@ export default function ProductCard({ product, onNavigate }: ProductCardProps) {
             ✨ SPECIAL
           </div>
         )}
+        {inCart && (
+          <div className="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
+            ✓ In Cart
+          </div>
+        )}
       </div>
 
       {/* Info */}
@@ -119,8 +129,8 @@ export default function ProductCard({ product, onNavigate }: ProductCardProps) {
             ₹{product.basePrice}
             {product.pricePerExtra && <span className="text-sm font-normal text-gray-400"> onwards</span>}
           </span>
-          <span className="text-sm text-[#89C4E1] font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-            View Details →
+          <span className={`text-sm font-medium transition-opacity ${inCart ? "text-green-600 opacity-100" : "text-[#89C4E1] opacity-0 group-hover:opacity-100"}`}>
+            {inCart ? "✓ Added" : "View Details →"}
           </span>
         </div>
       </div>
