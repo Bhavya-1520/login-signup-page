@@ -21,6 +21,13 @@ export interface OrderItem {
   image: string;
 }
 
+export interface OrderReview {
+  rating: number;
+  comment: string;
+  photos: string[];
+  createdAt: Timestamp | Date;
+}
+
 export interface Order {
   id?: string;
   userId: string;
@@ -31,7 +38,7 @@ export interface Order {
   paymentMethod: "online" | "cod";
   paymentId?: string;
   razorpayOrderId?: string;
-  status: "placed" | "processing" | "shipped" | "delivered" | "cancelled";
+  status: "placed" | "processing" | "shipped" | "delivered" | "cancelled" | "return-requested" | "replacement-requested" | "returned" | "replaced";
   deliveryDetails: {
     name: string;
     phone: string;
@@ -41,6 +48,8 @@ export interface Order {
     pincode: string;
     note: string;
   };
+  review?: OrderReview;
+  returnReason?: string;
   createdAt: Timestamp | Date;
 }
 
@@ -100,4 +109,37 @@ export async function updateOrderStatus(
 
   const orderRef = doc(db, "orders", orderId);
   await updateDoc(orderRef, { status });
+}
+
+// Cancel an order (only allowed before shipping)
+export async function cancelOrder(orderId: string): Promise<void> {
+  if (!db) throw new Error("Firebase not initialized");
+  const orderRef = doc(db, "orders", orderId);
+  await updateDoc(orderRef, { status: "cancelled" });
+}
+
+// Save a product review/feedback for a delivered order
+export async function saveOrderReview(
+  orderId: string,
+  review: { rating: number; comment: string; photos: string[] }
+): Promise<void> {
+  if (!db) throw new Error("Firebase not initialized");
+  const orderRef = doc(db, "orders", orderId);
+  await updateDoc(orderRef, {
+    review: { ...review, createdAt: Timestamp.now() },
+  });
+}
+
+// Request return or replacement
+export async function requestReturnOrReplacement(
+  orderId: string,
+  type: "return" | "replacement",
+  reason: string
+): Promise<void> {
+  if (!db) throw new Error("Firebase not initialized");
+  const orderRef = doc(db, "orders", orderId);
+  await updateDoc(orderRef, {
+    status: type === "return" ? "return-requested" : "replacement-requested",
+    returnReason: reason,
+  });
 }

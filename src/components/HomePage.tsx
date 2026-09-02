@@ -41,10 +41,10 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <p className="text-[#5EAED4] font-semibold tracking-wider uppercase text-sm mb-3">Our Collections</p>
-            <h2 className="font-display text-4xl sm:text-5xl font-bold text-[#2C1810]">
+            <h2 className="font-display text-2xl sm:text-4xl font-bold text-[#2C1810]">
               Crafted with Passion
             </h2>
-            <p className="text-gray-600 mt-4 max-w-lg mx-auto text-lg">
+            <p className="text-gray-600 mt-3 max-w-lg mx-auto text-sm sm:text-base">
               Each piece is lovingly handmade, designed to bring joy that lasts a lifetime
             </p>
           </div>
@@ -131,7 +131,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       <section className="section-floral-garden py-24 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="font-display text-4xl sm:text-5xl font-bold text-[#2C1810]">
+            <h2 className="font-display text-2xl sm:text-4xl font-bold text-[#2C1810]">
               Why The House Of Gnapakam?
             </h2>
           </div>
@@ -160,7 +160,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
             <p className="text-[#5EAED4] font-medium tracking-wider text-sm mb-2">Handcrafted Gifts, Delivered With Love</p>
-            <h2 className="font-display text-3xl sm:text-5xl font-bold text-[#2C1810]">
+            <h2 className="font-display text-2xl sm:text-4xl font-bold text-[#2C1810]">
               What Our Happy Customers Are Saying
             </h2>
           </div>
@@ -233,7 +233,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       <section className="section-floral-wild py-24">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="glass-card rounded-3xl p-12 sm:p-16">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#2C1810] mb-4">
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#2C1810] mb-4">
               Follow Our Journey 📸
             </h2>
             <p className="text-gray-600 mb-8 text-lg">See our latest creations and behind-the-scenes magic</p>

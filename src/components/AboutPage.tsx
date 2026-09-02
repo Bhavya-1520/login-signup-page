@@ -4,7 +4,7 @@ export default function AboutPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="text-center mb-12">
-        <h1 className="font-display text-4xl font-bold text-[#2C1810]">
+        <h1 className="font-display text-2xl sm:text-4xl font-bold text-[#2C1810]">
           About The House Of Gnapakam
         </h1>
         <p className="text-[#D4A574] mt-2 font-medium">Handcrafted with love, designed to last</p>

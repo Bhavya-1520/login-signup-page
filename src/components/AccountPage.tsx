@@ -251,6 +251,18 @@ export default function AccountPage({ onNavigate }: AccountPageProps) {
         </button>
 
         <button
+          onClick={() => onNavigate("bank-details")}
+          className="w-full glass-card rounded-2xl p-5 flex items-center gap-4 hover:shadow-md transition-all text-left"
+        >
+          <span className="text-2xl">🏦</span>
+          <div>
+            <p className="font-medium text-[#2C1810]">Bank & UPI Details</p>
+            <p className="text-xs text-gray-400">For order refunds</p>
+          </div>
+          <span className="ml-auto text-gray-300">›</span>
+        </button>
+
+        <button
           onClick={() => onNavigate("settings")}
           className="w-full glass-card rounded-2xl p-5 flex items-center gap-4 hover:shadow-md transition-all text-left"
         >

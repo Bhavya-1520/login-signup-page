@@ -18,6 +18,7 @@ import AccountPage from "./AccountPage";
 import AddressesPage from "./AddressesPage";
 import SettingsPage from "./SettingsPage";
 import SearchResultsPage from "./SearchResultsPage";
+import BankDetailsPage from "./BankDetailsPage";
 
 export default function AppContent() {
   const [currentPage, setCurrentPage] = useState("home");
@@ -60,7 +61,9 @@ export default function AppContent() {
       case "addresses":
         return <AddressesPage onNavigate={handleNavigate} />;
       case "settings":
-        return <SettingsPage onNavigate={handleNavigate} />;
+        return <AccountPage onNavigate={handleNavigate} />;
+      case "bank-details":
+        return <BankDetailsPage onNavigate={handleNavigate} />;
       case "about":
         return <AboutPage />;
       case "contact":

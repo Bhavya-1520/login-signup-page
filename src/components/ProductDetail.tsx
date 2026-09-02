@@ -200,7 +200,7 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
           <div className="text-sm text-[#89C4E1] font-medium uppercase tracking-wider mb-2">
             {product.category}
           </div>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-[#3D2B1F]">
+          <h1 className="font-display text-xl sm:text-3xl font-bold text-[#3D2B1F]">
             {product.name}
           </h1>
           <p className="text-gray-500 mt-4 leading-relaxed">{product.description}</p>

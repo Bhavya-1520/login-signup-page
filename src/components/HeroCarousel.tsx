@@ -9,50 +9,32 @@ interface HeroCarouselProps {
 const slides = [
   {
     image: "/images/Horse+Letter.jpeg",
-    title: "Customised Premium Decorated Horse & Letter Combo",
-    subtitle: "Handcrafted decorated horse + vintage letter + Rakhi",
-    price: "Combo at ₹599",
-    cta: "Order Now",
+    price: "Horse & Letter Combo starting at ₹599",
     link: "product-raksha-bandhan-combo",
   },
   {
     image: "/images/Horse.jpeg",
-    title: "Premium Decorated Horse",
-    subtitle: "A beautifully handcrafted premium decorated horse",
-    price: "Starting at ₹499",
-    cta: "Shop Now",
+    price: "Decorated Horse starting at ₹499",
     link: "product-raksha-bandhan-horse",
   },
   {
     image: "/images/satin boquet.png",
-    title: "Satin Ribbon Rose Bouquets",
-    subtitle: "Elegant handcrafted roses that last forever",
-    price: "Starting at ₹199",
-    cta: "Shop Now",
+    price: "Bouquets starting at ₹199",
     link: "product-satin-ribbon-bouquet",
   },
   {
     image: "/images/SunFlowerBoquet.jpeg",
-    title: "Sunflower Bouquet",
-    subtitle: "Bright and cheerful handcrafted sunflowers",
-    price: "Starting at ₹249",
-    cta: "Explore",
+    price: "Sunflower Bouquets starting at ₹249",
     link: "product-sunflower-bouquet",
   },
   {
     image: "/images/NormalPipecleanerboquet.jpeg",
-    title: "Pipe Cleaner Bouquets",
-    subtitle: "Colorful, cute & customizable in any shade",
-    price: "Starting at ₹99",
-    cta: "Explore Colors",
+    price: "Pipe Cleaner Bouquets starting at ₹99",
     link: "product-pipe-cleaner-bouquet",
   },
   {
     image: "/images/Potrait Boquet.jpeg",
-    title: "Portrait Photo Bouquets",
-    subtitle: "Your precious memories beautifully arranged as a bouquet",
-    price: "Starting at ₹299",
-    cta: "Create Yours",
+    price: "Photo Bouquets starting at ₹299",
     link: "product-portrait-bouquet",
   },
 ];
@@ -82,42 +64,30 @@ export default function HeroCarousel({ onNavigate }: HeroCarouselProps) {
             index === current ? "block" : "hidden"
           }`}
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center min-h-[60vh] sm:min-h-[70vh] py-10 sm:py-16">
-              {/* Left: Image (no card, just the picture) */}
-              <div className="flex items-center justify-center order-1">
-                <img
-                  src={slide.image}
-                  alt={slide.title}
-                  className="w-full h-[40vh] sm:h-[55vh] object-contain"
-                />
-              </div>
+          <div
+            onClick={() => onNavigate(slide.link)}
+            className="relative w-full h-[45vh] sm:h-[60vh] lg:h-[70vh] cursor-pointer"
+          >
+            {/* Full image */}
+            <img
+              src={slide.image}
+              alt={slide.price}
+              className="w-full h-full object-cover"
+            />
+            {/* Gradient overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
 
-              {/* Right: Caption */}
-              <div
-                className={`order-2 transition-all duration-700 delay-200 ${
-                  index === current ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-                }`}
+            {/* Text overlay on the image */}
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-10 text-center">
+              <p className="text-white font-display text-lg sm:text-3xl font-bold drop-shadow-lg mb-3">
+                {slide.price}
+              </p>
+              <button
+                onClick={(e) => { e.stopPropagation(); onNavigate(slide.link); }}
+                className="px-5 sm:px-8 py-2 sm:py-3 bg-white/90 text-[#5EAED4] font-semibold rounded-full hover:bg-white transition-all text-xs sm:text-base shadow-lg"
               >
-                <span className="inline-block glass-card px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm text-[#5EAED4] font-semibold mb-4 sm:mb-6">
-                  🌸 The House Of Gnapakam
-                </span>
-                <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2C1810] leading-tight mb-3 sm:mb-4">
-                  {slide.title}
-                </h1>
-                <p className="text-sm sm:text-lg text-gray-600 mb-3">
-                  {slide.subtitle}
-                </p>
-                <p className="text-xl sm:text-2xl font-bold text-[#5EAED4] font-display mb-6 sm:mb-8">
-                  {slide.price}
-                </p>
-                <button
-                  onClick={() => onNavigate(slide.link)}
-                  className="px-6 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white font-semibold rounded-full hover:shadow-2xl hover:shadow-sky-200/40 transition-all hover:-translate-y-1 text-sm sm:text-lg"
-                >
-                  {slide.cta} →
-                </button>
-              </div>
+                Shop Now →
+              </button>
             </div>
           </div>
         </div>

@@ -29,7 +29,7 @@ const productEmojis: Record<string, string> = {
 };
 
 export default function ProductCard({ product, onNavigate }: ProductCardProps) {
-  const { items } = useCart();
+  const { getItemByProductId, incrementByProductId, decrementByProductId } = useCart();
   // Get images from product or fallback
   const fallback = fallbackProducts.find((p) => p.id === product.id);
   const images = product.images || fallback?.images || (product.image ? [product.image] : []);
@@ -37,9 +37,20 @@ export default function ProductCard({ product, onNavigate }: ProductCardProps) {
   const emoji = productEmojis[product.id] || "🌸";
 
   // Check if this product is in the cart
-  const inCart = items.some((item) => item.productId === product.id);
+  const cartItem = getItemByProductId(product.id);
+  const inCart = !!cartItem;
 
   const [currentImg, setCurrentImg] = useState(0);
+
+  const handleIncrement = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    incrementByProductId(product.id);
+  };
+
+  const handleDecrement = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    decrementByProductId(product.id);
+  };
 
   const nextImg = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -114,24 +125,47 @@ export default function ProductCard({ product, onNavigate }: ProductCardProps) {
       </div>
 
       {/* Info */}
-      <div className="p-6">
-        <div className="text-xs text-[#89C4E1] font-medium uppercase tracking-wider mb-1.5">
+      <div className="p-4 sm:p-5">
+        <div className="text-[10px] sm:text-xs text-[#89C4E1] font-medium uppercase tracking-wider mb-1">
           {product.category}
         </div>
-        <h3 className="font-display text-lg font-semibold text-[#3D2B1F] group-hover:text-[#5EAED4] transition-colors">
+        <h3 className="font-display text-sm sm:text-base font-semibold text-[#3D2B1F] group-hover:text-[#5EAED4] transition-colors">
           {product.name}
         </h3>
-        <p className="text-gray-400 text-sm mt-2 line-clamp-2">
+        <p className="text-gray-400 text-xs sm:text-sm mt-1 line-clamp-2">
           {product.description}
         </p>
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-[#5EAED4] font-bold text-lg">
+          <span className="text-[#5EAED4] font-bold text-base sm:text-lg">
             ₹{product.basePrice}
-            {product.pricePerExtra && <span className="text-sm font-normal text-gray-400"> onwards</span>}
+            {product.pricePerExtra && <span className="text-xs sm:text-sm font-normal text-gray-400"> onwards</span>}
           </span>
-          <span className={`text-sm font-medium transition-opacity ${inCart ? "text-green-600 opacity-100" : "text-[#89C4E1] opacity-0 group-hover:opacity-100"}`}>
-            {inCart ? "✓ Added" : "View Details →"}
-          </span>
+          {inCart ? (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-2 bg-green-50 rounded-full px-2 py-1"
+            >
+              <button
+                onClick={handleDecrement}
+                className="w-6 h-6 rounded-full bg-white text-green-600 flex items-center justify-center font-bold shadow-sm hover:bg-green-100"
+              >
+                −
+              </button>
+              <span className="text-sm font-bold text-green-700 w-5 text-center">
+                {cartItem?.quantity}
+              </span>
+              <button
+                onClick={handleIncrement}
+                className="w-6 h-6 rounded-full bg-white text-green-600 flex items-center justify-center font-bold shadow-sm hover:bg-green-100"
+              >
+                +
+              </button>
+            </div>
+          ) : (
+            <span className="text-xs sm:text-sm font-medium text-[#89C4E1] opacity-0 group-hover:opacity-100 transition-opacity">
+              View →
+            </span>
+          )}
         </div>
       </div>
     </div>

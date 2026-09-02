@@ -44,7 +44,7 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="font-display text-3xl sm:text-5xl font-bold text-[#3D2B1F]">
+        <h1 className="font-display text-2xl sm:text-4xl font-bold text-[#3D2B1F]">
           Our Collection
         </h1>
         <p className="text-gray-500 mt-3">Find the perfect handcrafted gift for your loved ones</p>
