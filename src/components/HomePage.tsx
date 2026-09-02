@@ -37,9 +37,9 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       </section>
 
       {/* Collections - with floral background */}
-      <section className="section-floral-pink py-24">
+      <section className="section-floral-pink py-10 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-8 sm:mb-12">
             <p className="text-[#5EAED4] font-semibold tracking-wider uppercase text-sm mb-3">Our Collections</p>
             <h2 className="font-display text-2xl sm:text-4xl font-bold text-[#2C1810]">
               Crafted with Passion
@@ -128,111 +128,78 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       </section>
 
       {/* Why Choose Us - garden background */}
-      <section className="section-floral-garden py-24 relative overflow-hidden">
+      <section className="section-floral-garden py-10 sm:py-16 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
+          <div className="text-center mb-8 sm:mb-12">
             <h2 className="font-display text-2xl sm:text-4xl font-bold text-[#2C1810]">
               Why The House Of Gnapakam?
             </h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            <div className="text-center glass-card rounded-3xl p-10 hover:shadow-xl transition-all hover:-translate-y-1">
-              <div className="text-6xl mb-5">♾️</div>
-              <h3 className="font-display text-xl font-bold text-[#2C1810] mb-3">Everlasting Beauty</h3>
-              <p className="text-gray-500 leading-relaxed">Our handcrafted gifts stay beautiful forever. No maintenance needed — just eternal charm and color.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            <div className="text-center glass-card rounded-2xl p-5 sm:p-8 hover:shadow-xl transition-all hover:-translate-y-1">
+              <div className="text-4xl sm:text-5xl mb-3">♾️</div>
+              <h3 className="font-display text-base sm:text-lg font-bold text-[#2C1810] mb-2">Everlasting Beauty</h3>
+              <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">Our handcrafted gifts stay beautiful forever. No maintenance needed — just eternal charm and color.</p>
             </div>
-            <div className="text-center glass-card rounded-3xl p-10 hover:shadow-xl transition-all hover:-translate-y-1">
-              <div className="text-6xl mb-5">🎨</div>
-              <h3 className="font-display text-xl font-bold text-[#2C1810] mb-3">Fully Customizable</h3>
-              <p className="text-gray-500 leading-relaxed">Not just bouquets — we craft all kinds of handmade giftables. Any color, any design, any occasion.</p>
+            <div className="text-center glass-card rounded-2xl p-5 sm:p-8 hover:shadow-xl transition-all hover:-translate-y-1">
+              <div className="text-4xl sm:text-5xl mb-3">🎨</div>
+              <h3 className="font-display text-base sm:text-lg font-bold text-[#2C1810] mb-2">Fully Customizable</h3>
+              <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">Not just bouquets — we craft all kinds of handmade giftables. Any color, any design, any occasion.</p>
             </div>
-            <div className="text-center glass-card rounded-3xl p-10 hover:shadow-xl transition-all hover:-translate-y-1">
-              <div className="text-6xl mb-5">💝</div>
-              <h3 className="font-display text-xl font-bold text-[#2C1810] mb-3">Made with Love</h3>
-              <p className="text-gray-500 leading-relaxed">Every piece is handcrafted with passion and care — bouquets, hampers, cards, magnets, and more!</p>
+            <div className="text-center glass-card rounded-2xl p-5 sm:p-8 hover:shadow-xl transition-all hover:-translate-y-1">
+              <div className="text-4xl sm:text-5xl mb-3">💝</div>
+              <h3 className="font-display text-base sm:text-lg font-bold text-[#2C1810] mb-2">Made with Love</h3>
+              <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">Every piece is handcrafted with passion and care — bouquets, hampers, cards, magnets, and more!</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Customer Reviews */}
-      <section className="py-20 bg-white/50">
+      <section className="py-10 sm:py-16 bg-white/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
+          <div className="text-center mb-8 sm:mb-12">
             <p className="text-[#5EAED4] font-medium tracking-wider text-sm mb-2">Handcrafted Gifts, Delivered With Love</p>
             <h2 className="font-display text-2xl sm:text-4xl font-bold text-[#2C1810]">
               What Our Happy Customers Are Saying
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Review 1 */}
-            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
-              <div className="h-56 overflow-hidden bg-white">
-                <img
-                  src="/images/Horse+Letter.jpeg"
-                  alt="Customer order - Horse"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="p-4 text-center">
-                <div className="flex justify-center mb-2">
-                  <span className="text-lg">★★★★★</span>
-                </div>
-                <p className="font-semibold text-[#2C1810]">Priya S. ✓</p>
-                <p className="text-gray-500 text-sm mt-2 leading-relaxed">
-                  The Raksha Bandhan horse combo was a hit! My brother loved it. Quality is amazing 😍
-                </p>
-              </div>
+            <div className="glass-card rounded-2xl p-5 hover:shadow-lg transition-shadow">
+              <div className="text-yellow-400 text-base mb-2">★★★★★</div>
+              <p className="text-gray-600 text-sm leading-relaxed mb-3">
+                &quot;The Raksha Bandhan horse combo was a hit! My brother loved it. Quality is amazing 😍&quot;
+              </p>
+              <p className="font-semibold text-[#2C1810] text-sm">— Priya S. <span className="text-[#5EAED4]">✓</span></p>
             </div>
 
             {/* Review 2 */}
-            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
-              <div className="h-56 overflow-hidden bg-white">
-                <img
-                  src="/images/SunFlowerBoquet.jpeg"
-                  alt="Customer order - Sunflower"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="p-4 text-center">
-                <div className="flex justify-center mb-2">
-                  <span className="text-lg">★★★★★</span>
-                </div>
-                <p className="font-semibold text-[#2C1810]">Rahul M. ✓</p>
-                <p className="text-gray-500 text-sm mt-2 leading-relaxed">
-                  Beautiful sunflower bouquet, same as the picture on the website. Thank you for making my wife&apos;s day special!
-                </p>
-              </div>
+            <div className="glass-card rounded-2xl p-5 hover:shadow-lg transition-shadow">
+              <div className="text-yellow-400 text-base mb-2">★★★★★</div>
+              <p className="text-gray-600 text-sm leading-relaxed mb-3">
+                &quot;Beautiful sunflower bouquet, same as the picture on the website. Thank you for making my wife&apos;s day special!&quot;
+              </p>
+              <p className="font-semibold text-[#2C1810] text-sm">— Rahul M. <span className="text-[#5EAED4]">✓</span></p>
             </div>
 
             {/* Review 3 */}
-            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
-              <div className="h-56 overflow-hidden bg-white">
-                <img
-                  src="/images/NormalPipecleanerboquet.jpeg"
-                  alt="Customer order - Pipe Cleaner"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="p-4 text-center">
-                <div className="flex justify-center mb-2">
-                  <span className="text-lg">★★★★★</span>
-                </div>
-                <p className="font-semibold text-[#2C1810]">Ananya K. ✓</p>
-                <p className="text-gray-500 text-sm mt-2 leading-relaxed">
-                  Lovely pipe cleaner bouquet! The colors were exactly what I asked for. Will order again for sure.
-                </p>
-              </div>
+            <div className="glass-card rounded-2xl p-5 hover:shadow-lg transition-shadow">
+              <div className="text-yellow-400 text-base mb-2">★★★★★</div>
+              <p className="text-gray-600 text-sm leading-relaxed mb-3">
+                &quot;Lovely pipe cleaner bouquet! The colors were exactly what I asked for. Will order again for sure.&quot;
+              </p>
+              <p className="font-semibold text-[#2C1810] text-sm">— Ananya K. <span className="text-[#5EAED4]">✓</span></p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Instagram CTA - wildflower background */}
-      <section className="section-floral-wild py-24">
+      <section className="section-floral-wild py-10 sm:py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="glass-card rounded-3xl p-12 sm:p-16">
+          <div className="glass-card rounded-3xl p-6 sm:p-12">
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#2C1810] mb-4">
               Follow Our Journey 📸
             </h2>
@@ -251,9 +218,9 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       </section>
 
       {/* Footer */}
-      <footer className="footer-floral text-white py-16">
+      <footer className="footer-floral text-white py-10 sm:py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-3xl">🌸</span>

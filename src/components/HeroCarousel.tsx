@@ -66,25 +66,38 @@ export default function HeroCarousel({ onNavigate }: HeroCarouselProps) {
         >
           <div
             onClick={() => onNavigate(slide.link)}
-            className="relative w-full h-[45vh] sm:h-[60vh] lg:h-[70vh] cursor-pointer"
+            className="relative w-full cursor-pointer"
           >
-            {/* Full image */}
-            <img
-              src={slide.image}
-              alt={slide.price}
-              className="w-full h-full object-cover"
-            />
-            {/* Gradient overlay for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
+            {/* Image with dots inside at bottom */}
+            <div className="relative w-full h-[38vh] sm:h-[55vh] lg:h-[65vh]">
+              <img
+                src={slide.image}
+                alt={slide.price}
+                className="w-full h-full object-cover"
+              />
+              {/* Dots inside image */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
+                {slides.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={(e) => { e.stopPropagation(); goTo(i); }}
+                    className={`transition-all duration-300 rounded-full ${
+                      i === current ? "w-6 h-2 bg-white shadow" : "w-2 h-2 bg-white/60"
+                    }`}
+                    aria-label={`Slide ${i + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
 
-            {/* Text overlay on the image */}
-            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-10 text-center">
-              <p className="text-white font-display text-lg sm:text-3xl font-bold drop-shadow-lg mb-3">
+            {/* Caption bar BELOW dots — clean, own space */}
+            <div className="text-center py-4 sm:py-6 px-4">
+              <p className="text-[#2C3E50] font-display text-base sm:text-2xl font-bold mb-3">
                 {slide.price}
               </p>
               <button
                 onClick={(e) => { e.stopPropagation(); onNavigate(slide.link); }}
-                className="px-5 sm:px-8 py-2 sm:py-3 bg-white/90 text-[#5EAED4] font-semibold rounded-full hover:bg-white transition-all text-xs sm:text-base shadow-lg"
+                className="px-6 sm:px-8 py-2 sm:py-2.5 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white font-semibold rounded-full hover:shadow-lg transition-all text-xs sm:text-sm"
               >
                 Shop Now →
               </button>
@@ -93,41 +106,26 @@ export default function HeroCarousel({ onNavigate }: HeroCarouselProps) {
         </div>
       ))}
 
-      {/* Navigation Arrows */}
+      {/* Navigation Arrows - vertically centered on the image area only */}
       <button
         onClick={prev}
-        className="absolute left-2 sm:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 glass-card rounded-full flex items-center justify-center text-[#5EAED4] hover:bg-white/90 transition-all hover:scale-110"
+        className="absolute left-2 sm:left-6 top-[18vh] sm:top-[27vh] z-20 w-8 h-8 sm:w-11 sm:h-11 bg-white/80 rounded-full flex items-center justify-center text-[#5EAED4] hover:bg-white shadow-md transition-all"
         aria-label="Previous slide"
       >
-        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
       <button
         onClick={next}
-        className="absolute right-2 sm:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 glass-card rounded-full flex items-center justify-center text-[#5EAED4] hover:bg-white/90 transition-all hover:scale-110"
+        className="absolute right-2 sm:right-6 top-[18vh] sm:top-[27vh] z-20 w-8 h-8 sm:w-11 sm:h-11 bg-white/80 rounded-full flex items-center justify-center text-[#5EAED4] hover:bg-white shadow-md transition-all"
         aria-label="Next slide"
       >
-        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </button>
 
-      {/* Dots */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2 sm:gap-3">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goTo(index)}
-            className={`transition-all duration-300 rounded-full ${
-              index === current
-                ? "w-8 sm:w-10 h-2.5 sm:h-3 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC]"
-                : "w-2.5 sm:w-3 h-2.5 sm:h-3 bg-gray-300 hover:bg-gray-400"
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
     </section>
   );
 }

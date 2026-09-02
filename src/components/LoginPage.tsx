@@ -314,27 +314,43 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
   }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 relative">
-      <div className="absolute top-10 left-[10%] text-3xl opacity-20 animate-float">🌸</div>
-      <div className="absolute bottom-10 right-[10%] text-4xl opacity-15 animate-float-slow">🌷</div>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden bg-gradient-to-br from-[#E3F4FC] via-[#FDF2F8] to-[#F0F9FF]">
+      {/* Decorative floating elements */}
+      <div className="absolute top-10 left-[8%] text-3xl opacity-30 animate-float">🌸</div>
+      <div className="absolute top-24 right-[12%] text-2xl opacity-25 animate-float-slow">🌷</div>
+      <div className="absolute bottom-16 left-[15%] text-2xl opacity-25 animate-float">✿</div>
+      <div className="absolute bottom-24 right-[8%] text-3xl opacity-30 animate-float-slow">💐</div>
+      <div className="absolute top-1/2 left-[5%] text-xl opacity-20 animate-float">🌼</div>
 
-      <div className="max-w-md w-full relative z-10">
-        {/* Header */}
-        <div className="text-center mb-8">
+      <div className="max-w-sm w-full relative z-10">
+        {/* Logo + Name side by side */}
+        <div className="flex items-center justify-center gap-3 mb-2">
           <img
             src="/images/House_of_gnapakam_logo.jpeg"
             alt="The House Of Gnapakam"
-            className="w-16 h-16 rounded-full object-cover mx-auto mb-3 shadow-md"
+            className="w-12 h-12 rounded-full object-cover shadow-md"
           />
-          <h1 className="font-display text-3xl font-bold text-[#2C1810]">
-            {mode === "login" ? "Welcome Back" : "Create Account"}
+          <span className="font-elegant text-xl font-semibold text-[#2C3E50]">
+            The House Of Gnapakam
+          </span>
+        </div>
+
+        {/* Welcome line */}
+        <p className="text-center text-[#5EAED4] font-medium text-sm mb-6">
+          ✨ Welcome to The House Of Gnapakam ✨
+        </p>
+
+        {/* Header */}
+        <div className="text-center mb-5">
+          <h1 className="font-display text-xl font-bold text-[#2C1810]">
+            {mode === "login" ? "Welcome Back" : mode === "forgot" ? "Reset Password" : "Create Account"}
           </h1>
-          <p className="text-gray-500 mt-2 text-sm">
-            {mode === "login" ? "Sign in to continue shopping" : "Sign up to start ordering"}
+          <p className="text-gray-500 mt-1 text-xs">
+            {mode === "login" ? "Sign in to continue shopping" : mode === "forgot" ? "" : "Sign up to start ordering"}
           </p>
         </div>
 
-        <div className="glass-card rounded-3xl p-8">
+        <div className="glass-card rounded-3xl p-6 shadow-lg">
           {/* ========== LOGIN MODE ========== */}
           {mode === "login" && (
             <>
