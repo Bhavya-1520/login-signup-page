@@ -5,6 +5,7 @@ import { products as fallbackProducts } from "@/lib/products";
 import { getProducts } from "@/lib/productsDB";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useWishlist } from "@/context/WishlistContext";
 import { trackProductView, getRelatedProducts } from "@/lib/recommendations";
 import ProductCard from "./ProductCard";
 
@@ -18,6 +19,8 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
   const [allProducts, setAllProducts] = useState<any[]>(fallbackProducts);
   const { addItem } = useCart();
   const { user } = useAuth();
+  const { isWished, toggle } = useWishlist();
+  const [showShare, setShowShare] = useState(false);
 
   useEffect(() => {
     getProducts()
@@ -129,18 +132,43 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
     onNavigate("checkout");
   };
 
+  const handleWishlist = () => {
+    if (!product) return;
+    toggle({
+      productId: product.id,
+      name: product.name,
+      price: product.basePrice,
+      image: product.image,
+      category: product.category,
+    });
+  };
+
+  const getShareLink = () => {
+    if (typeof window === "undefined") return "";
+    return `${window.location.origin}/home/shop/${product?.id}`;
+  };
+
+  const shareWhatsApp = () => {
+    const text = `Check out this beautiful ${product?.name} from The House Of Gnapakam! ${getShareLink()}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+    setShowShare(false);
+  };
+
+  const shareInstagram = () => {
+    // Instagram doesn't support direct link sharing via URL; open Instagram DM/app
+    // Copy link and open Instagram
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(getShareLink()).catch(() => {});
+    }
+    window.open("https://www.instagram.com/direct/inbox/", "_blank");
+    setShowShare(false);
+  };
+
   const relatedProducts = product ? getRelatedProducts(allProducts, product) : [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <button
-        onClick={() => onNavigate("products")}
-        className="text-[#5EAED4] font-medium mb-8 flex items-center gap-2 hover:gap-3 transition-all"
-      >
-        ← Back to Shop
-      </button>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-2">
         {/* Product Image Gallery */}
         <div className="relative">
           <div className="aspect-square bg-white rounded-3xl flex items-center justify-center relative overflow-hidden glass-card">
@@ -327,10 +355,39 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
               </div>
             </div>
 
+            {/* Wishlist + Share row */}
+            <div className="flex items-center gap-8 pt-4">
+              <button onClick={handleWishlist} className="flex flex-col items-center gap-1 text-gray-500 hover:text-[#E8A0BF]">
+                <svg className="w-6 h-6" fill={isWished(product.id) ? "#E8A0BF" : "none"} stroke={isWished(product.id) ? "#E8A0BF" : "currentColor"} strokeWidth={1.8} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                </svg>
+                <span className="text-xs font-medium">{isWished(product.id) ? "Wishlisted" : "Wishlist"}</span>
+              </button>
+
+              <div className="relative">
+                <button onClick={() => setShowShare(!showShare)} className="flex flex-col items-center gap-1 text-gray-500 hover:text-[#5EAED4]">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                  </svg>
+                  <span className="text-xs font-medium">Share</span>
+                </button>
+                {showShare && (
+                  <div className="absolute bottom-full mb-2 left-0 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-20 w-40">
+                    <button onClick={shareWhatsApp} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-green-50 rounded-lg">
+                      <span className="text-green-500">💬</span> WhatsApp
+                    </button>
+                    <button onClick={shareInstagram} className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-pink-50 rounded-lg">
+                      <span>📸</span> Instagram
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Price */}
-            <div className="pt-6 border-t border-pink-100">
+            <div className="pt-4 border-t border-pink-100">
               <p className="text-sm text-gray-400">Total Price {quantity > 1 && `(${quantity} × ₹${calculatePrice()})`}</p>
-              <p className="text-3xl font-bold text-[#5EAED4] font-display">₹{calculatePrice() * quantity}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-[#5EAED4] font-display">₹{calculatePrice() * quantity}</p>
             </div>
 
             {/* Buy Now & Add to Cart buttons */}

@@ -220,19 +220,19 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       {/* Footer */}
       <footer className="footer-floral text-white py-10 sm:py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-3xl">🌸</span>
-                <span className="font-display text-2xl font-bold text-[#89C4E1]">The House Of Gnapakam</span>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xl">🌸</span>
+                <span className="font-display text-base font-bold text-[#89C4E1]">The House Of Gnapakam</span>
               </div>
-              <p className="text-gray-300 leading-relaxed">
+              <p className="text-gray-300 text-xs leading-relaxed">
                 All handmade giftables — bouquets, hampers, cards, magnets, decorated horses & more. Crafted with love, made to last forever.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-5 text-[#89C4E1] text-lg">Quick Links</h4>
-              <div className="space-y-3 text-gray-300">
+              <h4 className="font-semibold mb-3 text-[#89C4E1] text-sm">Quick Links</h4>
+              <div className="space-y-2 text-gray-300 text-xs">
                 <button onClick={() => onNavigate("products")} className="block hover:text-white transition-colors">Shop All</button>
                 <button onClick={() => onNavigate("raksha-bandhan")} className="block hover:text-white transition-colors">Raksha Bandhan</button>
                 <button onClick={() => onNavigate("about")} className="block hover:text-white transition-colors">About Us</button>
@@ -240,8 +240,8 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-5 text-[#89C4E1] text-lg">Connect With Us</h4>
-              <div className="space-y-3 text-gray-300">
+              <h4 className="font-semibold mb-3 text-[#89C4E1] text-sm">Connect With Us</h4>
+              <div className="space-y-2 text-gray-300 text-xs">
                 <a href="https://wa.me/919346630240?text=Hi%20The%20House%20Of%20Gnapakam!" target="_blank" rel="noopener noreferrer" className="block hover:text-white transition-colors">
                   💬 WhatsApp: +91 9346630240
                 </a>
@@ -257,7 +257,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               </div>
             </div>
           </div>
-          <div className="border-t border-white/10 mt-12 pt-8 text-center text-gray-400">
+          <div className="border-t border-white/10 mt-8 pt-5 text-center text-gray-400 text-xs">
             © 2026 The House Of Gnapakam. Made with 🌸 and love.
           </div>
         </div>

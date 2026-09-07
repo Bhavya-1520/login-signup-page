@@ -95,3 +95,24 @@ body {
 .footer-floral {
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
 }
+
+/* Hide scrollbar for category strip */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Aesthetic brand name treatment */
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: linear-gradient(120deg, #5EAED4 0%, #C77DA5 50%, #E8A0BF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}

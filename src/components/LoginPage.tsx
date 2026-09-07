@@ -323,16 +323,15 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
       <div className="absolute top-1/2 left-[5%] text-xl opacity-20 animate-float">🌼</div>
 
       <div className="max-w-sm w-full relative z-10">
-        {/* Logo + Name side by side */}
-        <div className="flex items-center justify-center gap-3 mb-2">
+        {/* Logo + Name */}
+        <div className="flex flex-col items-center mb-2">
           <img
             src="/images/House_of_gnapakam_logo.jpeg"
             alt="The House Of Gnapakam"
-            className="w-12 h-12 rounded-full object-cover shadow-md"
+            className="w-16 h-16 rounded-full object-cover shadow-md ring-2 ring-[#F8C8DC]/50 mb-2"
           />
-          <span className="font-elegant text-xl font-semibold text-[#2C3E50]">
-            The House Of Gnapakam
-          </span>
+          <span className="text-[11px] font-elegant tracking-[0.3em] text-[#89C4E1] uppercase">The House Of</span>
+          <span className="brand-name text-3xl">Gnapakam</span>
         </div>
 
         {/* Welcome line */}

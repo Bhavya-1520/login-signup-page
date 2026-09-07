@@ -2,9 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { products as fallbackProducts } from "@/lib/products";
-import { getProducts, CATEGORIES } from "@/lib/productsDB";
+import { getProducts } from "@/lib/productsDB";
 import { getRecommendations } from "@/lib/recommendations";
 import ProductCard from "./ProductCard";
+
+// Display groups with friendly labels
+const GROUP_FILTERS = [
+  { label: "All", value: "All" },
+  { label: "Bouquets", value: "Bouquets" },
+  { label: "Rakhi Gifts", value: "Rakhi" },
+  { label: "Resin Arts", value: "Resin" },
+  { label: "Birthday", value: "Birthday" },
+];
 
 interface ProductsPageProps {
   onNavigate: (page: string) => void;
@@ -16,6 +25,11 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
   const [products, setProducts] = useState<any[]>(fallbackProducts);
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState<any[]>([]);
+
+  // Update selected category when navigating between categories
+  useEffect(() => {
+    setSelectedCategory(initialCategory || "All");
+  }, [initialCategory]);
 
   useEffect(() => {
     getProducts()
@@ -38,7 +52,7 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
   const filteredProducts =
     selectedCategory === "All"
       ? products
-      : products.filter((p) => p.category === selectedCategory);
+      : products.filter((p) => (p.group || p.category) === selectedCategory);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -65,18 +79,18 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
       )}
 
       {/* Category Filters */}
-      <div className="flex flex-wrap justify-center gap-3 mb-10">
-        {CATEGORIES.map((cat) => (
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8">
+        {GROUP_FILTERS.map((g) => (
           <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
-              selectedCategory === cat
+            key={g.value}
+            onClick={() => setSelectedCategory(g.value)}
+            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
+              selectedCategory === g.value
                 ? "bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white shadow-lg shadow-sky-200/40"
                 : "glass-card text-gray-600 hover:text-[#5EAED4] hover:border-sky-200"
             }`}
           >
-            {cat}
+            {g.label}
           </button>
         ))}
       </div>

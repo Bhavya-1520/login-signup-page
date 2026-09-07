@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { products as fallbackProducts } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 
 interface ProductCardProps {
   product: {
@@ -30,6 +31,19 @@ const productEmojis: Record<string, string> = {
 
 export default function ProductCard({ product, onNavigate }: ProductCardProps) {
   const { getItemByProductId, incrementByProductId, decrementByProductId } = useCart();
+  const { isWished, toggle } = useWishlist();
+  const wished = isWished(product.id);
+
+  const handleWishlist = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggle({
+      productId: product.id,
+      name: product.name,
+      price: product.basePrice,
+      image: product.image,
+      category: product.category,
+    });
+  };
   // Get images from product or fallback
   const fallback = fallbackProducts.find((p) => p.id === product.id);
   const images = product.images || fallback?.images || (product.image ? [product.image] : []);
@@ -112,13 +126,24 @@ export default function ProductCard({ product, onNavigate }: ProductCardProps) {
           </div>
         )}
 
+        {/* Wishlist heart */}
+        <button
+          onClick={handleWishlist}
+          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center hover:scale-110 transition-transform z-10"
+          title={wished ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <svg className="w-4 h-4" fill={wished ? "#E8A0BF" : "none"} stroke={wished ? "#E8A0BF" : "#9ca3af"} strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+          </svg>
+        </button>
+
         {product.category === "Raksha Bandhan" && (
-          <div className="absolute top-4 right-4 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+          <div className="absolute top-2 left-2 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white text-[10px] font-bold px-2 py-1 rounded-full shadow">
             ✨ SPECIAL
           </div>
         )}
         {inCart && (
-          <div className="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
+          <div className="absolute bottom-2 left-2 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow flex items-center gap-1">
             ✓ In Cart
           </div>
         )}

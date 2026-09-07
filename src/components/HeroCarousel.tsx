@@ -69,11 +69,11 @@ export default function HeroCarousel({ onNavigate }: HeroCarouselProps) {
             className="relative w-full cursor-pointer"
           >
             {/* Image with dots inside at bottom */}
-            <div className="relative w-full h-[38vh] sm:h-[55vh] lg:h-[65vh]">
+            <div className="relative w-full h-[38vh] sm:h-[55vh] lg:h-[65vh] bg-gradient-to-br from-[#F0F9FF] to-[#FDF2F8]">
               <img
                 src={slide.image}
                 alt={slide.price}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
               {/* Dots inside image */}
               <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
