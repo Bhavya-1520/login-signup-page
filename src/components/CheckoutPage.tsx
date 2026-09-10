@@ -27,6 +27,7 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
   });
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   // Saved addresses
   const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
@@ -94,7 +95,9 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (e.target.name === "pincode") {
-      handlePincodeChange(e.target.value);
+      handlePincodeChange(e.target.value.replace(/\D/g, "").slice(0, 6));
+    } else if (e.target.name === "phone") {
+      setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 10) });
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
@@ -230,11 +233,11 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
             clearCart();
           } else {
             setLoading(false);
-            alert("Payment verification failed. If money was deducted, it will be refunded within 5-7 days.");
+            setPaymentError("Payment verification failed. If money was deducted, it will be refunded within 5-7 days.");
           }
         } catch (err) {
           setLoading(false);
-          alert("Payment verification failed. Please contact support.");
+          setPaymentError("Payment verification failed. Please contact support at +91 9346630240.");
         }
       },
       prefill: {
@@ -267,9 +270,10 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
     };
 
     const razorpay = new (window as any).Razorpay(options);
-    razorpay.on("payment.failed", function () {
+    razorpay.on("payment.failed", function (resp: any) {
       setLoading(false);
-      alert("Payment failed. Please try again.");
+      const reason = resp?.error?.description || resp?.error?.reason || "Your payment could not be completed.";
+      setPaymentError(reason);
     });
     razorpay.open();
   };
@@ -334,7 +338,19 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
       return;
     }
 
-    // Save address if new
+    // Validate phone: exactly 10 digits
+    if (!/^\d{10}$/.test(formData.phone)) {
+      alert("Please enter a valid 10-digit phone number");
+      return;
+    }
+
+    // Validate email if provided
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      alert("Please enter a valid email address");
+      return;
+    }
+
+    // Save address if new (so it appears in Saved Addresses next time)
     if (showNewAddress && user) {
       addAddress({
         userId: user.uid,
@@ -353,6 +369,39 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
       handleCOD();
     }
   };
+
+  if (paymentError) {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-16 text-center">
+        <span className="text-6xl block mb-4">❌</span>
+        <h2 className="font-display text-2xl font-bold text-[#2C1810] mb-3">
+          Payment Failed
+        </h2>
+        <div className="bg-red-50 border border-red-100 rounded-2xl p-4 mb-6">
+          <p className="text-red-600 text-sm">{paymentError}</p>
+        </div>
+        <p className="text-gray-500 text-sm mb-8">
+          Don&apos;t worry — no order was placed. If any amount was deducted, it will be refunded automatically within 5-7 business days.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <button
+            onClick={() => { setPaymentError(null); }}
+            className="px-8 py-3 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white font-semibold rounded-full hover:shadow-lg transition-all"
+          >
+            Try Again
+          </button>
+          <a
+            href="https://wa.me/919346630240?text=Hi,%20my%20payment%20failed%20on%20The%20House%20Of%20Gnapakam"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-8 py-3 border border-gray-300 text-gray-600 font-medium rounded-full hover:bg-gray-50 transition-all"
+          >
+            💬 Contact Support
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   if (orderPlaced) {
     return (

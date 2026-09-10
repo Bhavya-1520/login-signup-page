@@ -30,7 +30,7 @@ const productEmojis: Record<string, string> = {
 };
 
 export default function ProductCard({ product, onNavigate }: ProductCardProps) {
-  const { getItemByProductId, incrementByProductId, decrementByProductId } = useCart();
+  const { getItemByProductId } = useCart();
   const { isWished, toggle } = useWishlist();
   const wished = isWished(product.id);
 
@@ -50,21 +50,11 @@ export default function ProductCard({ product, onNavigate }: ProductCardProps) {
   const hasImage = images.length > 0 && !images[0].includes("placeholder");
   const emoji = productEmojis[product.id] || "🌸";
 
-  // Check if this product is in the cart
+  // Check if this product is in the cart (just to show a badge)
   const cartItem = getItemByProductId(product.id);
   const inCart = !!cartItem;
 
   const [currentImg, setCurrentImg] = useState(0);
-
-  const handleIncrement = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    incrementByProductId(product.id);
-  };
-
-  const handleDecrement = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    decrementByProductId(product.id);
-  };
 
   const nextImg = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -165,32 +155,9 @@ export default function ProductCard({ product, onNavigate }: ProductCardProps) {
             ₹{product.basePrice}
             {product.pricePerExtra && <span className="text-xs sm:text-sm font-normal text-gray-400"> onwards</span>}
           </span>
-          {inCart ? (
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-2 bg-green-50 rounded-full px-2 py-1"
-            >
-              <button
-                onClick={handleDecrement}
-                className="w-6 h-6 rounded-full bg-white text-green-600 flex items-center justify-center font-bold shadow-sm hover:bg-green-100"
-              >
-                −
-              </button>
-              <span className="text-sm font-bold text-green-700 w-5 text-center">
-                {cartItem?.quantity}
-              </span>
-              <button
-                onClick={handleIncrement}
-                className="w-6 h-6 rounded-full bg-white text-green-600 flex items-center justify-center font-bold shadow-sm hover:bg-green-100"
-              >
-                +
-              </button>
-            </div>
-          ) : (
-            <span className="text-xs sm:text-sm font-medium text-[#89C4E1] opacity-0 group-hover:opacity-100 transition-opacity">
-              View →
-            </span>
-          )}
+          <span className="text-xs sm:text-sm font-medium text-[#89C4E1]">
+            View →
+          </span>
         </div>
       </div>
     </div>

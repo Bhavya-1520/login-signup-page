@@ -45,15 +45,23 @@ export default function AccountPage({ onNavigate }: AccountPageProps) {
 
   const handleSave = async () => {
     if (!user) return;
+
+    // Validate phone: must be exactly 10 digits
+    if (profile.phone && !/^\d{10}$/.test(profile.phone)) {
+      alert("Please enter a valid 10-digit phone number");
+      return;
+    }
+
     setSaving(true);
     try {
-      // Update Firebase Auth display name
+      // Update Firebase Auth display name (this always works)
       const { auth } = await import("@/lib/firebase");
       if (auth?.currentUser) {
         await updateProfile(auth.currentUser, { displayName: profile.name });
       }
 
       // Save extra info to Firestore
+      const { db } = await import("@/lib/firebase");
       if (db) {
         await setDoc(doc(db, "profiles", user.uid), {
           name: profile.name,
@@ -68,8 +76,15 @@ export default function AccountPage({ onNavigate }: AccountPageProps) {
       setEditing(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-    } catch (err) {
-      alert("Failed to save profile");
+    } catch (err: any) {
+      console.error("Profile save error:", err.code, err.message);
+      // Even if Firestore fails, the name was saved to Auth — show partial success
+      if (err.code === "permission-denied") {
+        alert("Could not save extra details (database permission). Your name was updated. Please check Firestore rules.");
+        setEditing(false);
+      } else {
+        alert("Failed to save profile: " + (err.message || "Unknown error"));
+      }
     }
     setSaving(false);
   };
@@ -178,9 +193,9 @@ export default function AccountPage({ onNavigate }: AccountPageProps) {
             <span className="text-sm text-gray-500 w-32 flex-shrink-0">Phone</span>
             {editing ? (
               <input
-                type="tel" value={profile.phone}
-                onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                placeholder="+91 9876543210"
+                type="tel" inputMode="numeric" maxLength={10} value={profile.phone}
+                onChange={(e) => setProfile({ ...profile, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                placeholder="10-digit number"
                 className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#89C4E1] focus:border-transparent outline-none text-gray-900"
               />
             ) : (

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { products as fallbackProducts } from "@/lib/products";
 import { getProducts } from "@/lib/productsDB";
-import { getRecommendations } from "@/lib/recommendations";
 import ProductCard from "./ProductCard";
 
 // Display groups with friendly labels
@@ -24,7 +23,6 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
   const [selectedCategory, setSelectedCategory] = useState(initialCategory || "All");
   const [products, setProducts] = useState<any[]>(fallbackProducts);
   const [loading, setLoading] = useState(true);
-  const [recommendations, setRecommendations] = useState<any[]>([]);
 
   // Update selected category when navigating between categories
   useEffect(() => {
@@ -42,13 +40,6 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
       .catch(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    // Load recommendations after products are loaded
-    if (products.length > 0) {
-      setRecommendations(getRecommendations(products));
-    }
-  }, [products]);
-
   const filteredProducts =
     selectedCategory === "All"
       ? products
@@ -63,20 +54,6 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
         </h1>
         <p className="text-gray-500 mt-3">Find the perfect handcrafted gift for your loved ones</p>
       </div>
-
-      {/* Recommended for you */}
-      {recommendations.length > 0 && selectedCategory === "All" && (
-        <div className="mb-10">
-          <h2 className="font-display text-xl font-bold text-[#2C1810] mb-4 flex items-center gap-2">
-            ✨ Recommended For You
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {recommendations.map((product) => (
-              <ProductCard key={product.id} product={product} onNavigate={onNavigate} />
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Category Filters */}
       <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8">

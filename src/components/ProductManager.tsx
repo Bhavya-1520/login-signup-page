@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   getProducts,
   addProduct,
@@ -17,6 +17,19 @@ export default function ProductManager() {
   const [editingProduct, setEditingProduct] = useState<ProductDB | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
+
+  const handleImageFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setForm((prev) => ({ ...prev, image: reader.result as string }));
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
 
   const [form, setForm] = useState({
     name: "",
@@ -208,14 +221,40 @@ export default function ProductManager() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-                <input
-                  type="text"
-                  value={form.image}
-                  onChange={(e) => setForm({ ...form, image: e.target.value })}
-                  placeholder="/images/product.jpg or https://..."
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8A0BF] focus:border-transparent outline-none text-gray-900 bg-white/80"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
+                <div className="flex items-center gap-3">
+                  {/* Preview */}
+                  {form.image && (
+                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-50 border border-gray-200 flex-shrink-0">
+                      <img src={form.image} alt="preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  {/* Camera button */}
+                  <button
+                    type="button"
+                    onClick={() => cameraRef.current?.click()}
+                    className="flex flex-col items-center justify-center gap-1 w-20 h-16 rounded-xl border-2 border-dashed border-gray-300 hover:border-[#89C4E1] text-gray-500"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                    </svg>
+                    <span className="text-[10px]">Camera</span>
+                  </button>
+                  {/* Upload button */}
+                  <button
+                    type="button"
+                    onClick={() => galleryRef.current?.click()}
+                    className="flex flex-col items-center justify-center gap-1 w-20 h-16 rounded-xl border-2 border-dashed border-gray-300 hover:border-[#89C4E1] text-gray-500"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                    </svg>
+                    <span className="text-[10px]">Upload</span>
+                  </button>
+                </div>
+                <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handleImageFile} className="hidden" />
+                <input ref={galleryRef} type="file" accept="image/*" onChange={handleImageFile} className="hidden" />
               </div>
             </div>
 

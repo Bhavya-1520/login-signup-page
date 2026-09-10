@@ -230,7 +230,19 @@ export default function ManagerDashboard({ onNavigate }: ManagerDashboardProps) 
       {filteredOrders.length === 0 ? (
         <div className="text-center py-16">
           <span className="text-5xl block mb-4">📭</span>
-          <p className="text-gray-500">No orders found</p>
+          <p className="text-gray-600 font-medium">
+            {filter === "all" && "No orders yet"}
+            {filter === "placed" && "No newly placed orders"}
+            {filter === "processing" && "Nothing is being processed right now"}
+            {filter === "shipped" && "No orders shipped yet"}
+            {filter === "delivered" && "No orders delivered yet"}
+            {filter === "cancelled" && "No cancelled orders"}
+          </p>
+          <p className="text-gray-400 text-sm mt-1">
+            {filter === "all"
+              ? "Orders from customers will appear here."
+              : `Orders with "${filter}" status will show up here.`}
+          </p>
         </div>
       ) : (
         <div className="space-y-4">

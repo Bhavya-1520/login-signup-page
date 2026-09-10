@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getUserOrders, cancelOrder, saveOrderReview, requestReturnOrReplacement, Order } from "@/lib/orders";
+import { getBankAccounts, getUpiDetails, BankAccount, UpiDetail } from "@/lib/bankDetails";
 
 interface OrdersPageProps {
   onNavigate: (page: string) => void;
@@ -27,6 +28,11 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
   const [returnReason, setReturnReason] = useState("");
   const [savingReturn, setSavingReturn] = useState(false);
 
+  // Bank/UPI for refund
+  const [banks, setBanks] = useState<BankAccount[]>([]);
+  const [upis, setUpis] = useState<UpiDetail[]>([]);
+  const [refundMethodId, setRefundMethodId] = useState<string>("");
+
   const loadOrders = () => {
     if (user) {
       getUserOrders(user.uid)
@@ -38,6 +44,9 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
   useEffect(() => {
     if (user) {
       loadOrders();
+      // Load saved bank/UPI for refunds
+      getBankAccounts(user.uid).then(setBanks).catch(() => {});
+      getUpiDetails(user.uid).then(setUpis).catch(() => {});
     } else if (!authLoading) {
       setLoading(false);
     }
@@ -90,6 +99,11 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
       alert("Please provide a reason");
       return;
     }
+    // For returns, a refund method (bank/UPI) is required
+    if (returnType === "return" && !refundMethodId) {
+      alert("Please select or add a bank account / UPI for the refund");
+      return;
+    }
     setSavingReturn(true);
     try {
       await requestReturnOrReplacement(returnOrder.id, returnType, returnReason);
@@ -97,6 +111,7 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
       setOrders((prev) => prev.map((o) => o.id === returnOrder.id ? { ...o, status: newStatus as Order["status"], returnReason } : o));
       setReturnOrder(null);
       setReturnReason("");
+      setRefundMethodId("");
     } catch {
       alert("Failed to submit request");
     }
@@ -166,11 +181,11 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
   const isTrackable = (s: string) => statusSteps.includes(s);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <h1 className="font-display text-xl sm:text-2xl font-bold text-[#2C1810] mb-1">My Orders</h1>
       <p className="text-gray-500 text-xs sm:text-sm mb-6">{orders.length} order{orders.length > 1 ? "s" : ""}</p>
 
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
         {orders.map((order) => {
           const isExpanded = expandedOrder === order.id;
           const currentStep = getStatusStep(order.status);
@@ -178,7 +193,7 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
           const isDelivered = order.status === "delivered";
 
           return (
-            <div key={order.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div key={order.id} className={`bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden ${isExpanded ? "sm:col-span-2" : ""}`}>
               {/* Clickable Header */}
               <div onClick={() => setExpandedOrder(isExpanded ? null : order.id || null)} className="cursor-pointer p-4 sm:p-5">
                 <div className="flex items-center justify-between mb-3">
@@ -376,11 +391,51 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
               </button>
             </div>
 
-            <textarea value={returnReason} onChange={(e) => setReturnReason(e.target.value)} placeholder="Reason for return/replacement..." rows={3} className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#89C4E1] outline-none text-gray-900 resize-none mb-4" />
+            <textarea value={returnReason} onChange={(e) => setReturnReason(e.target.value)} placeholder="Reason for return/replacement..." rows={2} className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-[#89C4E1] outline-none text-gray-900 resize-none mb-4" />
+
+            {/* Refund method — only for returns */}
+            {returnType === "return" && (
+              <div className="mb-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">Where should we refund?</p>
+                {(banks.length === 0 && upis.length === 0) ? (
+                  <div className="text-center py-3 bg-sky-50 rounded-xl">
+                    <p className="text-xs text-gray-500 mb-2">No bank/UPI added yet</p>
+                    <button
+                      onClick={() => { setReturnOrder(null); onNavigate("bank-details"); }}
+                      className="text-sm text-[#5EAED4] font-medium hover:underline"
+                    >
+                      + Add Bank / UPI Details
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                    {upis.map((u) => (
+                      <label key={u.id} className={`flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer ${refundMethodId === `upi-${u.id}` ? "border-[#89C4E1] bg-sky-50" : "border-gray-200"}`}>
+                        <input type="radio" name="refund" checked={refundMethodId === `upi-${u.id}`} onChange={() => setRefundMethodId(`upi-${u.id}`)} className="accent-[#89C4E1]" />
+                        <span className="text-sm text-[#2C1810]">📱 {u.upiId}</span>
+                        {u.verified && <span className="text-[10px] text-green-600 ml-auto">✓ Verified</span>}
+                      </label>
+                    ))}
+                    {banks.map((b) => (
+                      <label key={b.id} className={`flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer ${refundMethodId === `bank-${b.id}` ? "border-[#89C4E1] bg-sky-50" : "border-gray-200"}`}>
+                        <input type="radio" name="refund" checked={refundMethodId === `bank-${b.id}`} onChange={() => setRefundMethodId(`bank-${b.id}`)} className="accent-[#89C4E1]" />
+                        <span className="text-sm text-[#2C1810]">🏦 {b.bankName} ••••{b.accountNumber.slice(-4)}</span>
+                      </label>
+                    ))}
+                    <button
+                      onClick={() => { setReturnOrder(null); onNavigate("bank-details"); }}
+                      className="text-xs text-[#5EAED4] font-medium hover:underline mt-1"
+                    >
+                      + Add another account
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             <p className="text-xs text-gray-400 mb-4">
               {returnType === "return"
-                ? "The product will be picked up and refund processed after we receive it in your linked bank/UPI."
+                ? "After we receive the returned product, your refund will be sent to the selected bank/UPI within 5-7 business days."
                 : "The product will be replaced with a new one after pickup."}
             </p>
 
