@@ -54,6 +54,11 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
   }, [user, authLoading]);
 
   const handleCancel = async (orderId: string) => {
+    const order = orders.find((o) => o.id === orderId);
+    if (!order || order.status !== "placed") {
+      alert("This order can no longer be cancelled — it is already being processed.");
+      return;
+    }
     if (!confirm("Are you sure you want to cancel this order?")) return;
     try {
       await cancelOrder(orderId);
@@ -189,7 +194,7 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
         {orders.map((order) => {
           const isExpanded = expandedOrder === order.id;
           const currentStep = getStatusStep(order.status);
-          const canCancel = ["placed", "processing"].includes(order.status);
+          const canCancel = order.status === "placed";
           const isDelivered = order.status === "delivered";
 
           return (
@@ -303,8 +308,8 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
                         Cancel Order
                       </button>
                     )}
-                    {order.status === "shipped" && (
-                      <p className="text-xs text-gray-400 italic w-full">Note: Order already shipped — cancellation is no longer available.</p>
+                    {["processing", "shipped"].includes(order.status) && (
+                      <p className="text-xs text-gray-400 italic w-full">Note: Order is already being processed — cancellation is no longer available.</p>
                     )}
 
                     {/* After delivery: feedback + return/replacement */}

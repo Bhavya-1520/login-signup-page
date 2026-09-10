@@ -20,6 +20,7 @@ export interface ProductDB {
   id?: string;
   name: string;
   category: string;
+  group?: string;
   description: string;
   basePrice: number;
   image: string;
@@ -37,6 +38,19 @@ export const CATEGORIES = [
   "Special",
   "Raksha Bandhan",
 ];
+
+// Map a product category to its display group (Bouquets / Rakhi / Resin / Birthday)
+export function categoryToGroup(category: string): string {
+  const map: Record<string, string> = {
+    "Satin Ribbon": "Bouquets",
+    "Pipe Cleaner": "Bouquets",
+    "Special": "Bouquets",
+    "Raksha Bandhan": "Rakhi",
+    "Resin Bangles": "Resin",
+    "Gifts": "Birthday",
+  };
+  return map[category] || "Bouquets";
+}
 
 export async function getProducts(): Promise<ProductDB[]> {
   if (!db) throw new Error("Firebase not initialized");

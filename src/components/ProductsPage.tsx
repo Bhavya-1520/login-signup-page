@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { products as fallbackProducts } from "@/lib/products";
-import { getProducts } from "@/lib/productsDB";
+import { getProducts, categoryToGroup } from "@/lib/productsDB";
 import ProductCard from "./ProductCard";
 
 // Display groups with friendly labels
@@ -32,18 +32,26 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
   useEffect(() => {
     getProducts()
       .then((dbProducts) => {
-        if (dbProducts.length > 0) {
-          setProducts(dbProducts);
-        }
+        // Merge default products with dashboard-added ones (avoid duplicates by id)
+        const dbIds = new Set(dbProducts.map((p) => p.id));
+        const merged = [
+          ...dbProducts.map((p) => ({ ...p, group: p.group || categoryToGroup(p.category) })),
+          ...fallbackProducts.filter((p) => !dbIds.has(p.id)),
+        ];
+        setProducts(merged);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        // If Firestore fails, at least show the default products
+        setProducts(fallbackProducts);
+        setLoading(false);
+      });
   }, []);
 
   const filteredProducts =
     selectedCategory === "All"
       ? products
-      : products.filter((p) => (p.group || p.category) === selectedCategory);
+      : products.filter((p) => (p.group || categoryToGroup(p.category)) === selectedCategory);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

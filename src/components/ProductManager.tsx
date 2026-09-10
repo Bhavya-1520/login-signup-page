@@ -89,6 +89,14 @@ export default function ProductManager() {
       alert("Please fill in name, description, and price");
       return;
     }
+    if (Number(form.basePrice) <= 0) {
+      alert("Base price must be greater than 0");
+      return;
+    }
+    if (Number(form.pricePerExtra) < 0) {
+      alert("Price per extra cannot be negative");
+      return;
+    }
 
     setSaving(true);
 
@@ -204,8 +212,9 @@ export default function ProductManager() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Base Price (₹) *</label>
                 <input
                   type="number"
+                  min={0}
                   value={form.basePrice || ""}
-                  onChange={(e) => setForm({ ...form, basePrice: Number(e.target.value) })}
+                  onChange={(e) => setForm({ ...form, basePrice: Math.max(0, Number(e.target.value)) })}
                   placeholder="199"
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8A0BF] focus:border-transparent outline-none text-gray-900 bg-white/80"
                 />
@@ -214,8 +223,9 @@ export default function ProductManager() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Price Per Extra (₹)</label>
                 <input
                   type="number"
+                  min={0}
                   value={form.pricePerExtra || ""}
-                  onChange={(e) => setForm({ ...form, pricePerExtra: Number(e.target.value) })}
+                  onChange={(e) => setForm({ ...form, pricePerExtra: Math.max(0, Number(e.target.value)) })}
                   placeholder="100"
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8A0BF] focus:border-transparent outline-none text-gray-900 bg-white/80"
                 />
