@@ -118,20 +118,20 @@ export default function AccountPage({ onNavigate }: AccountPageProps) {
 
       {/* Profile Card */}
       <div className="glass-card rounded-2xl p-6 sm:p-8 mb-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#89C4E1] to-[#F8C8DC] text-white font-bold text-2xl flex items-center justify-center shadow-lg">
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-4 sm:gap-5 min-w-0">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[#89C4E1] to-[#F8C8DC] text-white font-bold text-xl sm:text-2xl flex items-center justify-center shadow-lg flex-shrink-0">
               {initial}
             </div>
-            <div>
-              <h2 className="text-xl font-semibold text-[#2C1810]">{profile.name || "User"}</h2>
-              <p className="text-gray-500 text-sm">{user.email}</p>
+            <div className="min-w-0">
+              <h2 className="text-lg sm:text-xl font-semibold text-[#2C1810] truncate">{profile.name || "User"}</h2>
+              <p className="text-gray-500 text-xs sm:text-sm truncate">{user.email}</p>
             </div>
           </div>
           {!editing && (
             <button
               onClick={() => setEditing(true)}
-              className="text-sm text-[#5EAED4] font-medium hover:underline"
+              className="flex-shrink-0 px-4 py-1.5 rounded-full border border-[#89C4E1] text-sm text-[#5EAED4] font-medium hover:bg-sky-50 transition-colors"
             >
               Edit
             </button>

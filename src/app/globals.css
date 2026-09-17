@@ -18,6 +18,19 @@
   --text-muted: #5D7A8C;
 }
 
+/* Reduce the base font size so the whole site (text + spacing) scales down
+   and reads like a polished website rather than oversized text.
+   Tailwind's rem-based classes scale proportionally from this root size. */
+html {
+  font-size: 87.5%; /* ~14px base on desktop/laptop */
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 81.25%; /* ~13px base on mobile */
+  }
+}
+
 body {
   font-family: 'Inter', sans-serif;
   background: linear-gradient(180deg, #F0F9FF 0%, #FDF2F8 50%, #F0F9FF 100%);

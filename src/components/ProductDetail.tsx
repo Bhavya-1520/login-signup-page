@@ -18,7 +18,7 @@ interface ProductDetailProps {
 export default function ProductDetail({ productId, onNavigate }: ProductDetailProps) {
   const [product, setProduct] = useState<any>(fallbackProducts.find((p) => p.id === productId) || null);
   const [allProducts, setAllProducts] = useState<any[]>(fallbackProducts);
-  const { addItem, items } = useCart();
+  const { addItem, removeItem, items } = useCart();
   const { user } = useAuth();
   const { isWished, toggle } = useWishlist();
   const [showShare, setShowShare] = useState(false);
@@ -107,21 +107,30 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
     });
   };
 
+  // The exact size/detail label for the current selection
+  const currentSizeLabel = [
+    selectedVariant,
+    selectedSize || (product?.pricePerExtra ? `Flowers: ${flowerCount}` : ""),
+  ]
+    .filter(Boolean)
+    .join(" • ");
+
+  // The matching cart item for the current selection (same product + size + colors)
+  const matchingCartItem = items.find(
+    (i) => i.productId === product?.id && i.size === currentSizeLabel && i.colors === colors
+  );
+
   const handleAddToCart = () => {
-    // Prevent adding the same product+size+color twice — if already there, don't re-add
-    const sizeLabel = [selectedVariant, selectedSize || (product.pricePerExtra ? `Flowers: ${flowerCount}` : "")].filter(Boolean).join(" • ");
-    const alreadyInCart = items.some(
-      (i) => i.productId === product.id && i.size === sizeLabel && i.colors === colors
-    );
-    if (alreadyInCart) {
-      setAdded(true);
-      setTimeout(() => setAdded(false), 2000);
+    // Toggle: if this exact product+size+color is already in the cart, remove it
+    if (matchingCartItem) {
+      removeItem(matchingCartItem.id);
       return;
     }
 
+    // Otherwise add it
     addToCart();
     setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    setTimeout(() => setAdded(false), 1500);
 
     // Send "added to cart" reminder email to logged-in customer
     if (user?.email) {
@@ -144,11 +153,7 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
 
   const handleBuyNow = () => {
     // Only add if this exact product+size+color isn't already in the cart
-    const sizeLabel = [selectedVariant, selectedSize || (product.pricePerExtra ? `Flowers: ${flowerCount}` : "")].filter(Boolean).join(" • ");
-    const alreadyInCart = items.some(
-      (i) => i.productId === product.id && i.size === sizeLabel && i.colors === colors
-    );
-    if (!alreadyInCart) {
+    if (!matchingCartItem) {
       addToCart();
     }
     onNavigate("checkout");
@@ -448,12 +453,18 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
               <button
                 onClick={handleAddToCart}
                 className={`flex-1 px-6 py-4 rounded-full font-semibold border-2 transition-all ${
-                  added
+                  matchingCartItem
+                    ? "bg-green-50 border-green-400 text-green-600 hover:bg-red-50 hover:border-red-300 hover:text-red-500"
+                    : added
                     ? "bg-green-50 border-green-400 text-green-600"
                     : "bg-white border-[#89C4E1] text-[#5EAED4] hover:bg-sky-50"
                 }`}
               >
-                {added ? "✓ Added to Cart!" : "🛒 Add to Cart"}
+                {matchingCartItem
+                  ? "✓ In Cart — Click to Remove"
+                  : added
+                  ? "✓ Added to Cart!"
+                  : "🛒 Add to Cart"}
               </button>
               <button
                 onClick={handleBuyNow}
