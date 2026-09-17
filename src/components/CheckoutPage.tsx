@@ -5,6 +5,7 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { saveOrder } from "@/lib/orders";
 import { getUserAddresses, addAddress, Address } from "@/lib/addresses";
+import PhotoUploader from "./PhotoUploader";
 
 interface CheckoutPageProps {
   onNavigate: (page: string) => void;
@@ -13,7 +14,7 @@ interface CheckoutPageProps {
 type PaymentMethod = "online" | "cod";
 
 export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, totalPrice, clearCart, setItemPhotos } = useCart();
   const { user, loading: authLoading } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("online");
   const [formData, setFormData] = useState({
@@ -195,6 +196,7 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                   colors: i.colors,
                   customNote: i.customNote,
                   image: i.image,
+                  customPhotos: i.customPhotos || [],
                 })),
                 totalAmount: totalPrice,
                 paymentMethod: "online",
@@ -330,11 +332,28 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
     setLoading(false);
   };
 
+  // Cart items that require photos but don't have any yet
+  const missingPhotoItems = items.filter(
+    (i) => i.requiresPhotos && (!i.customPhotos || i.customPhotos.length === 0)
+  );
+
   const handlePlaceOrder = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name || !formData.phone || !formData.address || !formData.city || !formData.pincode) {
       alert("Please fill in all required fields");
+      return;
+    }
+
+    // Block checkout until photos are uploaded for customised products
+    if (missingPhotoItems.length > 0) {
+      alert(
+        `Please upload at least one photo for: ${missingPhotoItems
+          .map((i) => i.name)
+          .join(", ")}`
+      );
+      const el = document.getElementById("photo-upload-section");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
@@ -638,6 +657,43 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
               )}
             </div>
 
+            {/* Photo upload for customised products */}
+            {items.some((i) => i.requiresPhotos) && (
+              <div id="photo-upload-section" className="glass-card rounded-3xl p-6 sm:p-8 space-y-6">
+                <div>
+                  <h2 className="font-display text-xl font-semibold text-[#2C1810]">
+                    📸 Upload Your Photos
+                  </h2>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Your customised items need photos before we can craft them. Upload the photos for each item below.
+                  </p>
+                </div>
+                {items
+                  .filter((i) => i.requiresPhotos)
+                  .map((item) => (
+                    <div key={item.id} className="p-4 rounded-2xl bg-pink-50/50 border border-pink-100">
+                      <div className="flex items-center gap-3 mb-3">
+                        <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover" />
+                        <div>
+                          <p className="text-sm font-semibold text-[#2C1810]">{item.name}</p>
+                          <p className="text-xs text-gray-500">{item.size}</p>
+                        </div>
+                        {item.customPhotos && item.customPhotos.length > 0 && (
+                          <span className="ml-auto text-xs text-green-600 font-medium">
+                            ✓ {item.customPhotos.length} photo{item.customPhotos.length > 1 ? "s" : ""}
+                          </span>
+                        )}
+                      </div>
+                      <PhotoUploader
+                        photos={item.customPhotos || []}
+                        onChange={(photos) => setItemPhotos(item.id, photos)}
+                        max={item.maxPhotos || 5}
+                      />
+                    </div>
+                  ))}
+              </div>
+            )}
+
             {/* Payment Method */}
             <div className="glass-card rounded-3xl p-6 sm:p-8">
               <h2 className="font-display text-xl font-semibold text-[#2C1810] mb-5">
@@ -744,16 +800,23 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || missingPhotoItems.length > 0}
                 className="w-full mt-6 py-4 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white font-semibold rounded-full hover:shadow-xl hover:shadow-pink-200/50 transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading
                   ? "Processing..."
+                  : missingPhotoItems.length > 0
+                  ? "📸 Upload photos to continue"
                   : paymentMethod === "online"
                   ? `Pay ₹${totalPrice}`
                   : `Place Order (COD) — ₹${totalPrice}`
                 }
               </button>
+              {missingPhotoItems.length > 0 && (
+                <p className="text-center text-xs text-amber-600 mt-2">
+                  Please upload photos for your customised item(s) above.
+                </p>
+              )}
 
               {paymentMethod === "online" && (
                 <p className="text-center text-xs text-gray-400 mt-3">

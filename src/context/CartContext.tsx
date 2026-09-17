@@ -12,6 +12,9 @@ export interface CartItem {
   colors?: string;
   customNote?: string;
   image: string;
+  requiresPhotos?: boolean;
+  maxPhotos?: number;
+  customPhotos?: string[];
 }
 
 interface CartContextType {
@@ -23,6 +26,7 @@ interface CartContextType {
   getItemByProductId: (productId: string) => CartItem | undefined;
   incrementByProductId: (productId: string) => void;
   decrementByProductId: (productId: string) => void;
+  setItemPhotos: (id: string, photos: string[]) => void;
   totalItems: number;
   totalPrice: number;
 }
@@ -36,6 +40,7 @@ const CartContext = createContext<CartContextType>({
   getItemByProductId: () => undefined,
   incrementByProductId: () => {},
   decrementByProductId: () => {},
+  setItemPhotos: () => {},
   totalItems: 0,
   totalPrice: 0,
 });
@@ -55,7 +60,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (existing) {
         return prev.map((i) =>
           i.id === existing.id
-            ? { ...i, quantity: i.quantity + item.quantity }
+            ? {
+                ...i,
+                quantity: i.quantity + item.quantity,
+                // Keep any newly-provided custom photos
+                customPhotos: item.customPhotos && item.customPhotos.length > 0
+                  ? item.customPhotos
+                  : i.customPhotos,
+              }
             : i
         );
       }
@@ -106,6 +118,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const setItemPhotos = (id: string, photos: string[]) => {
+    setItems((prev) =>
+      prev.map((i) => (i.id === id ? { ...i, customPhotos: photos } : i))
+    );
+  };
+
   const clearCart = () => setItems([]);
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -125,6 +143,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         getItemByProductId,
         incrementByProductId,
         decrementByProductId,
+        setItemPhotos,
         totalItems,
         totalPrice,
       }}

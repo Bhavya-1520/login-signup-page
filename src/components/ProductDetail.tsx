@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { trackProductView, getRelatedProducts } from "@/lib/recommendations";
 import ProductCard from "./ProductCard";
+import PhotoUploader from "./PhotoUploader";
 
 interface ProductDetailProps {
   productId: string;
@@ -53,6 +54,7 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
   const [customNote, setCustomNote] = useState("");
   const [currentImage, setCurrentImage] = useState(0);
   const [added, setAdded] = useState(false);
+  const [customPhotos, setCustomPhotos] = useState<string[]>([]);
 
   if (!product) {
     return (
@@ -99,6 +101,9 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
       colors: colors,
       customNote: customNote,
       image: product.image,
+      requiresPhotos: !!product.requiresPhotos,
+      maxPhotos: product.maxPhotos || 5,
+      customPhotos: product.requiresPhotos ? customPhotos : undefined,
     });
   };
 
@@ -334,6 +339,21 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
                 className="w-full px-4 py-3 glass-card rounded-2xl focus:ring-2 focus:ring-[#89C4E1] focus:border-transparent outline-none text-gray-900"
               />
             </div>
+
+            {/* Photo upload for customised products */}
+            {product.requiresPhotos && (
+              <div className="p-4 rounded-2xl bg-pink-50/50 border border-pink-100">
+                <PhotoUploader
+                  photos={customPhotos}
+                  onChange={setCustomPhotos}
+                  max={product.maxPhotos || 5}
+                  label={`📸 Upload your photos (required, up to ${product.maxPhotos || 5})`}
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  We&apos;ll use these photos to create your customised {product.name}. You can also add them at checkout.
+                </p>
+              </div>
+            )}
 
             {/* Custom note */}
             <div>

@@ -11,6 +11,9 @@ export interface Product {
   variants?: { label: string; priceAdjust: number }[];
   customizable: boolean;
   pricePerExtra?: number;
+  // When true, the customer must upload photo(s) before checkout (max = maxPhotos, default 5)
+  requiresPhotos?: boolean;
+  maxPhotos?: number;
 }
 
 export const products: Product[] = [
@@ -47,10 +50,38 @@ export const products: Product[] = [
     name: "Portrait Photo Bouquet",
     category: "Special",
     group: "Bouquets",
-    description: "A stunning bouquet made with your favourite photos arranged like flowers. Send us your pictures and we'll create a beautiful memory bouquet wrapped in pink with a ribbon bow. The perfect personalized gift!",
+    description: "A stunning bouquet made with your favourite photos arranged like flowers. Send us your pictures and we'll create a beautiful memory bouquet wrapped in pink with a ribbon bow. The perfect personalized gift! Upload up to 10 photos you'd like us to use.",
     basePrice: 299,
     image: "/images/Potrait Boquet.jpeg",
     customizable: true,
+    requiresPhotos: true,
+    maxPhotos: 10,
+  },
+  {
+    id: "customised-coffee-cup",
+    name: "Customised Coffee Cup",
+    category: "Gifts",
+    group: "Birthday",
+    description: "A personalised coffee cup printed with your favourite photos and messages. Upload up to 5 photos and we'll craft a keepsake mug that makes every sip special. Perfect for birthdays, anniversaries, and gifting!",
+    basePrice: 399,
+    image: "/images/Coffeemug1.jpeg",
+    images: ["/images/Coffeemug1.jpeg", "/images/coffeemug2.jpeg"],
+    customizable: true,
+    requiresPhotos: true,
+    maxPhotos: 5,
+  },
+  {
+    id: "customised-magic-cup",
+    name: "Customised Magic Cup",
+    category: "Gifts",
+    group: "Birthday",
+    description: "A magic colour-changing cup that reveals your favourite photos when a hot drink is poured in! Upload up to 5 photos and surprise your loved ones with this magical personalised keepsake.",
+    basePrice: 699,
+    image: "/images/Magiccup1.jpeg",
+    images: ["/images/Magiccup1.jpeg", "/images/Magiccup2.jpeg"],
+    customizable: true,
+    requiresPhotos: true,
+    maxPhotos: 5,
   },
   {
     id: "sunflower-bouquet",
