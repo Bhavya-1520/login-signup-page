@@ -15,6 +15,8 @@ export interface CartItem {
   requiresPhotos?: boolean;
   maxPhotos?: number;
   customPhotos?: string[];
+  // Max units allowed for this line (min of per-order limit and stock)
+  maxQuantity?: number;
 }
 
 interface CartContextType {
@@ -85,7 +87,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return;
     }
     setItems((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, quantity } : i))
+      prev.map((i) => {
+        if (i.id !== id) return i;
+        // Never exceed the line's max (stock/per-order limit), default cap 10
+        const cap = i.maxQuantity ?? 10;
+        return { ...i, quantity: Math.min(quantity, cap) };
+      })
     );
   };
 

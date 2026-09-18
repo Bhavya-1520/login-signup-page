@@ -72,7 +72,7 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
           <button onClick={() => onNavigate("home")} className="flex items-center gap-2 flex-shrink-0">
             <img src="/images/House_of_gnapakam_logo.jpeg" alt="Logo" className="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover shadow-sm ring-2 ring-[#F8C8DC]/50" />
             <div className="flex flex-col items-center leading-none">
-              <span className="text-[9px] sm:text-[11px] font-elegant tracking-[0.3em] text-[#89C4E1] uppercase">The House Of</span>
+              <span className="text-[9px] sm:text-[11px] font-elegant tracking-[0.3em] text-[#3A7C9A] font-semibold uppercase">The House Of</span>
               <span className="brand-name text-base sm:text-2xl whitespace-nowrap">Gnapakam</span>
             </div>
           </button>

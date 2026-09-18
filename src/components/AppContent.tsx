@@ -184,7 +184,7 @@ function GatedApp() {
       case "products":
         return <ProductsPage onNavigate={handleNavigate} />;
       case "raksha-bandhan":
-        return <ProductsPage onNavigate={handleNavigate} initialCategory="Raksha Bandhan" />;
+        return <ProductsPage onNavigate={handleNavigate} initialCategory="Rakhi" />;
       case "cart":
         return <CartPage onNavigate={handleNavigate} />;
       case "checkout":
@@ -216,8 +216,8 @@ function GatedApp() {
     }
   };
 
-  // Show back button on all pages except home
-  const showBack = currentPage !== "home";
+  // Show back button on all pages except home and the shop (products) landing page
+  const showBack = currentPage !== "home" && currentPage !== "products";
 
   return (
     <>

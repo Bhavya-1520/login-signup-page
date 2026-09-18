@@ -14,6 +14,8 @@ export interface Product {
   // When true, the customer must upload photo(s) before checkout (max = maxPhotos, default 5)
   requiresPhotos?: boolean;
   maxPhotos?: number;
+  // Manager inventory: how many units are available. undefined = not tracked (treated as in stock).
+  stock?: number;
 }
 
 export const products: Product[] = [

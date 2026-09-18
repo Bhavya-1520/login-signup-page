@@ -39,6 +39,7 @@ export default function ProductManager() {
     image: "",
     customizable: true,
     pricePerExtra: 0,
+    stock: 0,
   });
 
   useEffect(() => {
@@ -64,6 +65,7 @@ export default function ProductManager() {
       image: "",
       customizable: true,
       pricePerExtra: 0,
+      stock: 0,
     });
     setEditingProduct(null);
     setShowForm(false);
@@ -79,6 +81,7 @@ export default function ProductManager() {
       image: product.image,
       customizable: product.customizable,
       pricePerExtra: product.pricePerExtra || 0,
+      stock: product.stock ?? 0,
     });
     setShowForm(true);
   };
@@ -107,6 +110,7 @@ export default function ProductManager() {
       basePrice: Number(form.basePrice),
       image: form.image || "/images/placeholder.jpg",
       customizable: form.customizable,
+      stock: Math.max(0, Number(form.stock)),
       ...(form.pricePerExtra > 0 && { pricePerExtra: Number(form.pricePerExtra) }),
     };
 
@@ -268,6 +272,21 @@ export default function ProductManager() {
               </div>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Inventory / Stock (units available) *</label>
+              <input
+                type="number"
+                min={0}
+                value={form.stock}
+                onChange={(e) => setForm({ ...form, stock: Math.max(0, Number(e.target.value)) })}
+                placeholder="e.g., 5"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8A0BF] focus:border-transparent outline-none text-gray-900 bg-white/80"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Customers cannot order more than this. Set to 0 to mark as out of stock.
+              </p>
+            </div>
+
             <div className="flex items-center gap-3">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -332,9 +351,14 @@ export default function ProductManager() {
                 <p className="text-xs text-gray-400 truncate mt-0.5">{product.description}</p>
               </div>
 
-              {/* Price */}
+              {/* Price + stock */}
               <div className="text-right flex-shrink-0">
-                <span className="font-bold text-[#C77DA5] font-display">₹{product.basePrice}</span>
+                <span className="font-bold text-[#C77DA5] font-display block">₹{product.basePrice}</span>
+                {product.stock !== undefined && (
+                  <span className={`text-xs font-medium ${product.stock === 0 ? "text-red-500" : product.stock <= 5 ? "text-amber-600" : "text-green-600"}`}>
+                    {product.stock === 0 ? "Out of stock" : `${product.stock} in stock`}
+                  </span>
+                )}
               </div>
 
               {/* Actions */}

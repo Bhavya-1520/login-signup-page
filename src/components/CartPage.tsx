@@ -42,16 +42,22 @@ export default function CartPage({ onNavigate }: CartPageProps) {
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  className="w-8 h-8 rounded-full glass-card flex items-center justify-center hover:border-pink-300 transition-colors"
-                >−</button>
-                <span className="font-medium w-6 text-center">{item.quantity}</span>
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className="w-8 h-8 rounded-full glass-card flex items-center justify-center hover:border-pink-300 transition-colors"
-                >+</button>
+              <div className="flex flex-col items-center gap-1">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                    className="w-8 h-8 rounded-full glass-card flex items-center justify-center hover:border-pink-300 transition-colors"
+                  >−</button>
+                  <span className="font-medium w-6 text-center">{item.quantity}</span>
+                  <button
+                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    disabled={item.quantity >= (item.maxQuantity ?? 10)}
+                    className="w-8 h-8 rounded-full glass-card flex items-center justify-center hover:border-pink-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >+</button>
+                </div>
+                {item.quantity >= (item.maxQuantity ?? 10) && (
+                  <span className="text-[10px] text-amber-600 whitespace-nowrap">Max {item.maxQuantity ?? 10}</span>
+                )}
               </div>
 
               <span className="font-bold text-[#C77DA5] w-20 text-right">₹{item.price * item.quantity}</span>

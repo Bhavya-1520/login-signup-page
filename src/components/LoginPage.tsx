@@ -64,8 +64,17 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
     setLoginLoading(true);
     try {
       const { auth } = await import("@/lib/firebase");
-      if (!auth) return;
+      if (!auth) {
+        setLoginLoading(false);
+        return;
+      }
       await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
+      // Credentials are correct — show the loading state for ~3 seconds,
+      // then let the app switch to the home page. We intentionally keep
+      // loginLoading = true so the spinner/overlay stays visible.
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      // Do NOT set loginLoading(false) here — onAuthStateChanged will move
+      // the user to the home page and unmount this login screen.
     } catch (err: any) {
       const msgs: Record<string, string> = {
         "auth/user-not-found": "No account found with this email",
@@ -75,7 +84,6 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
         "auth/too-many-requests": "Too many attempts. Try again later",
       };
       setLoginError(msgs[err.code] || "Login failed. Please try again.");
-    } finally {
       setLoginLoading(false);
     }
   };
@@ -315,6 +323,21 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden bg-gradient-to-br from-[#E3F4FC] via-[#FDF2F8] to-[#F0F9FF]">
+      {/* Full-screen loading overlay while signing in (shows for ~3s on success) */}
+      {loginLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-[#E3F4FC] via-[#FDF2F8] to-[#F0F9FF]">
+          <div className="text-center">
+            <img
+              src="/images/House_of_gnapakam_logo.jpeg"
+              alt="The House Of Gnapakam"
+              className="w-20 h-20 rounded-full object-cover mx-auto mb-5 shadow-lg ring-2 ring-[#F8C8DC]/50 animate-pulse"
+            />
+            <div className="animate-spin w-10 h-10 border-4 border-[#89C4E1] border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-[#5EAED4] font-medium">Signing you in...</p>
+          </div>
+        </div>
+      )}
+
       {/* Decorative floating elements */}
       <div className="absolute top-10 left-[8%] text-3xl opacity-30 animate-float">🌸</div>
       <div className="absolute top-24 right-[12%] text-2xl opacity-25 animate-float-slow">🌷</div>
@@ -330,7 +353,7 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
             alt="The House Of Gnapakam"
             className="w-16 h-16 rounded-full object-cover shadow-md ring-2 ring-[#F8C8DC]/50 mb-2"
           />
-          <span className="text-[11px] font-elegant tracking-[0.3em] text-[#89C4E1] uppercase">The House Of</span>
+          <span className="text-[11px] font-elegant tracking-[0.3em] text-[#3A7C9A] font-semibold uppercase">The House Of</span>
           <span className="brand-name text-3xl">Gnapakam</span>
         </div>
 

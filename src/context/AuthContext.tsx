@@ -1,7 +1,13 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { User, onAuthStateChanged, signOut } from "firebase/auth";
+import {
+  User,
+  onAuthStateChanged,
+  signOut,
+  setPersistence,
+  browserLocalPersistence,
+} from "firebase/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -21,14 +27,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Dynamic import to avoid server-side execution
-    import("@/lib/firebase").then(({ auth }) => {
+    import("@/lib/firebase").then(async ({ auth }) => {
       if (auth) {
-        // Sign out on every fresh page load (no persistent sessions)
-        const isNewSession = !sessionStorage.getItem("session_active");
-        if (isNewSession) {
-          signOut(auth).then(() => {
-            sessionStorage.setItem("session_active", "true");
-          });
+        // Keep the user logged in across page reloads and browser restarts.
+        // Firebase local persistence stores the session so reopening the site
+        // takes them straight to home with their previous credentials.
+        try {
+          await setPersistence(auth, browserLocalPersistence);
+        } catch {
+          // Persistence may fail in some privacy modes; auth still works for the session.
         }
 
         const unsubscribe = onAuthStateChanged(auth, (user) => {

@@ -27,6 +27,8 @@ export interface ProductDB {
   sizes?: ProductSize[];
   customizable: boolean;
   pricePerExtra?: number;
+  // Manager inventory: units available. undefined = not tracked.
+  stock?: number;
 }
 
 export const CATEGORIES = [

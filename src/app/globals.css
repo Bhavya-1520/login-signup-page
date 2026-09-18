@@ -118,14 +118,15 @@ body {
   display: none;
 }
 
-/* Aesthetic brand name treatment */
+/* Aesthetic brand name treatment — dark, rich and highlighted */
 .brand-name {
   font-family: 'Playfair Display', serif;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.04em;
-  background: linear-gradient(120deg, #5EAED4 0%, #C77DA5 50%, #E8A0BF 100%);
+  background: linear-gradient(120deg, #1E6E96 0%, #A83B72 50%, #7A2E52 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: transparent;
+  color: #7A2E52; /* solid dark fallback where gradient clip is unsupported */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
