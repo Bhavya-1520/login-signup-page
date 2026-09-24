@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getUserOrders, cancelOrder, saveOrderReview, requestReturnOrReplacement, Order } from "@/lib/orders";
-import { getBankAccounts, getUpiDetails, BankAccount, UpiDetail } from "@/lib/bankDetails";
+import { getUpiDetails, UpiDetail } from "@/lib/bankDetails";
 
 interface OrdersPageProps {
   onNavigate: (page: string) => void;
@@ -28,8 +28,7 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
   const [returnReason, setReturnReason] = useState("");
   const [savingReturn, setSavingReturn] = useState(false);
 
-  // Bank/UPI for refund
-  const [banks, setBanks] = useState<BankAccount[]>([]);
+  // UPI for refund
   const [upis, setUpis] = useState<UpiDetail[]>([]);
   const [refundMethodId, setRefundMethodId] = useState<string>("");
 
@@ -44,8 +43,7 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
   useEffect(() => {
     if (user) {
       loadOrders();
-      // Load saved bank/UPI for refunds
-      getBankAccounts(user.uid).then(setBanks).catch(() => {});
+      // Load saved UPI IDs for refunds
       getUpiDetails(user.uid).then(setUpis).catch(() => {});
     } else if (!authLoading) {
       setLoading(false);
@@ -401,15 +399,15 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
             {/* Refund method — only for returns */}
             {returnType === "return" && (
               <div className="mb-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Where should we refund?</p>
-                {(banks.length === 0 && upis.length === 0) ? (
+                <p className="text-sm font-medium text-gray-700 mb-2">Where should we refund? (UPI)</p>
+                {upis.length === 0 ? (
                   <div className="text-center py-3 bg-sky-50 rounded-xl">
-                    <p className="text-xs text-gray-500 mb-2">No bank/UPI added yet</p>
+                    <p className="text-xs text-gray-500 mb-2">No UPI ID added yet</p>
                     <button
                       onClick={() => { setReturnOrder(null); onNavigate("bank-details"); }}
                       className="text-sm text-[#5EAED4] font-medium hover:underline"
                     >
-                      + Add Bank / UPI Details
+                      + Add UPI ID
                     </button>
                   </div>
                 ) : (
@@ -421,17 +419,11 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
                         {u.verified && <span className="text-[10px] text-green-600 ml-auto">✓ Verified</span>}
                       </label>
                     ))}
-                    {banks.map((b) => (
-                      <label key={b.id} className={`flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer ${refundMethodId === `bank-${b.id}` ? "border-[#89C4E1] bg-sky-50" : "border-gray-200"}`}>
-                        <input type="radio" name="refund" checked={refundMethodId === `bank-${b.id}`} onChange={() => setRefundMethodId(`bank-${b.id}`)} className="accent-[#89C4E1]" />
-                        <span className="text-sm text-[#2C1810]">🏦 {b.bankName} ••••{b.accountNumber.slice(-4)}</span>
-                      </label>
-                    ))}
                     <button
                       onClick={() => { setReturnOrder(null); onNavigate("bank-details"); }}
                       className="text-xs text-[#5EAED4] font-medium hover:underline mt-1"
                     >
-                      + Add another account
+                      + Add another UPI ID
                     </button>
                   </div>
                 )}

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import {
-  getBankAccounts, addBankAccount, deleteBankAccount, BankAccount,
   getUpiDetails, addUpiDetail, updateUpiDetail, deleteUpiDetail, UpiDetail,
   isValidUpiFormat,
 } from "@/lib/bankDetails";
@@ -14,14 +13,8 @@ interface BankDetailsPageProps {
 
 export default function BankDetailsPage({ onNavigate }: BankDetailsPageProps) {
   const { user, loading: authLoading } = useAuth();
-  const [banks, setBanks] = useState<BankAccount[]>([]);
   const [upis, setUpis] = useState<UpiDetail[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Bank form
-  const [showBankForm, setShowBankForm] = useState(false);
-  const [bankForm, setBankForm] = useState({ accountHolder: "", accountNumber: "", ifsc: "", bankName: "" });
-  const [savingBank, setSavingBank] = useState(false);
 
   // UPI form
   const [showUpiForm, setShowUpiForm] = useState(false);
@@ -29,50 +22,27 @@ export default function BankDetailsPage({ onNavigate }: BankDetailsPageProps) {
   const [verifyingUpi, setVerifyingUpi] = useState(false);
   const [upiError, setUpiError] = useState("");
 
+  // Live format validity for the green tick as the user types
+  const formatValid = isValidUpiFormat(upiInput.trim());
+
   useEffect(() => {
     if (user) {
-      Promise.all([getBankAccounts(user.uid), getUpiDetails(user.uid)])
-        .then(([b, u]) => { setBanks(b); setUpis(u); setLoading(false); })
+      getUpiDetails(user.uid)
+        .then((u) => { setUpis(u); setLoading(false); })
         .catch(() => setLoading(false));
     } else if (!authLoading) {
       setLoading(false);
     }
   }, [user, authLoading]);
 
-  const handleAddBank = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-    if (!bankForm.accountHolder || !bankForm.accountNumber || !bankForm.ifsc || !bankForm.bankName) {
-      alert("Please fill all bank details");
-      return;
-    }
-    setSavingBank(true);
-    try {
-      const id = await addBankAccount({ ...bankForm, userId: user.uid });
-      setBanks((prev) => [...prev, { ...bankForm, id, userId: user.uid }]);
-      setBankForm({ accountHolder: "", accountNumber: "", ifsc: "", bankName: "" });
-      setShowBankForm(false);
-    } catch {
-      alert("Failed to save bank account");
-    }
-    setSavingBank(false);
-  };
-
-  const handleDeleteBank = async (id: string) => {
-    if (!confirm("Remove this bank account?")) return;
-    try {
-      await deleteBankAccount(id);
-      setBanks((prev) => prev.filter((b) => b.id !== id));
-    } catch {}
-  };
-
   const handleAddUpi = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
     setUpiError("");
 
-    if (!isValidUpiFormat(upiInput)) {
-      setUpiError("Invalid UPI format. Should be like name@okhdfcbank");
+    const upiId = upiInput.trim();
+    if (!isValidUpiFormat(upiId)) {
+      setUpiError("Invalid UPI format. It should look like name@okhdfcbank");
       return;
     }
 
@@ -81,15 +51,16 @@ export default function BankDetailsPage({ onNavigate }: BankDetailsPageProps) {
       const res = await fetch("/api/upi/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ upiId: upiInput }),
+        body: JSON.stringify({ upiId }),
       });
       const data = await res.json();
 
-      const id = await addUpiDetail({ userId: user.uid, upiId: upiInput, verified: !!data.verified });
-      setUpis((prev) => [...prev, { id, userId: user.uid, upiId: upiInput, verified: !!data.verified }]);
+      // Save to Firebase regardless, storing the verified flag
+      const id = await addUpiDetail({ userId: user.uid, upiId, verified: !!data.verified });
+      setUpis((prev) => [...prev, { id, userId: user.uid, upiId, verified: !!data.verified }]);
 
       if (!data.verified) {
-        setUpiError(data.error || "Could not verify this UPI ID.");
+        setUpiError(data.error || "Could not verify this UPI ID. Please double-check it.");
       }
       setUpiInput("");
       setShowUpiForm(false);
@@ -143,68 +114,15 @@ export default function BankDetailsPage({ onNavigate }: BankDetailsPageProps) {
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="font-display text-xl sm:text-2xl font-bold text-[#2C1810] mb-1">Bank & UPI Details</h1>
-      <p className="text-gray-400 text-xs sm:text-sm mb-6">Used for order refunds. Keep them accurate.</p>
-
-      {/* Bank Accounts */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-[#2C1810]">Bank Accounts</h2>
-          <button
-            onClick={() => setShowBankForm(!showBankForm)}
-            className="text-sm text-[#5EAED4] font-medium hover:underline"
-          >
-            + Add Bank Account
-          </button>
-        </div>
-
-        {showBankForm && (
-          <form onSubmit={handleAddBank} className="glass-card rounded-2xl p-4 mb-4 space-y-3">
-            <input type="text" placeholder="Account Holder Name" value={bankForm.accountHolder}
-              onChange={(e) => setBankForm({ ...bankForm, accountHolder: e.target.value })}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#89C4E1] outline-none text-gray-900 bg-white text-sm" />
-            <input type="text" placeholder="Account Number" value={bankForm.accountNumber}
-              onChange={(e) => setBankForm({ ...bankForm, accountNumber: e.target.value })}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#89C4E1] outline-none text-gray-900 bg-white text-sm" />
-            <input type="text" placeholder="IFSC Code" value={bankForm.ifsc}
-              onChange={(e) => setBankForm({ ...bankForm, ifsc: e.target.value.toUpperCase() })}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#89C4E1] outline-none text-gray-900 bg-white text-sm" />
-            <input type="text" placeholder="Bank Name" value={bankForm.bankName}
-              onChange={(e) => setBankForm({ ...bankForm, bankName: e.target.value })}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#89C4E1] outline-none text-gray-900 bg-white text-sm" />
-            <div className="flex gap-2">
-              <button type="submit" disabled={savingBank} className="px-5 py-2 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white font-medium rounded-full text-sm disabled:opacity-50">
-                {savingBank ? "Saving..." : "Save"}
-              </button>
-              <button type="button" onClick={() => setShowBankForm(false)} className="px-5 py-2 bg-gray-100 text-gray-600 font-medium rounded-full text-sm">Cancel</button>
-            </div>
-          </form>
-        )}
-
-        {banks.length === 0 && !showBankForm ? (
-          <p className="text-gray-400 text-sm py-4 text-center">No bank accounts added yet</p>
-        ) : (
-          <div className="space-y-3">
-            {banks.map((bank) => (
-              <div key={bank.id} className="glass-card rounded-2xl p-4 flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-[#2C1810] text-sm">{bank.bankName}</p>
-                  <p className="text-xs text-gray-500">{bank.accountHolder}</p>
-                  <p className="text-xs text-gray-400">A/C: ••••{bank.accountNumber.slice(-4)} | {bank.ifsc}</p>
-                </div>
-                <button onClick={() => bank.id && handleDeleteBank(bank.id)} className="text-xs text-red-500 hover:underline">Remove</button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <h1 className="font-display text-xl sm:text-2xl font-bold text-[#2C1810] mb-1">UPI Details</h1>
+      <p className="text-gray-400 text-xs sm:text-sm mb-6">Used for order refunds. Add the UPI ID where you&apos;d like to receive refunds.</p>
 
       {/* UPI Details */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-[#2C1810]">UPI IDs</h2>
+          <h2 className="font-semibold text-[#2C1810]">Your UPI IDs</h2>
           <button
-            onClick={() => { setShowUpiForm(!showUpiForm); setUpiError(""); }}
+            onClick={() => { setShowUpiForm(!showUpiForm); setUpiError(""); setUpiInput(""); }}
             className="text-sm text-[#5EAED4] font-medium hover:underline"
           >
             + Add UPI ID
@@ -214,11 +132,40 @@ export default function BankDetailsPage({ onNavigate }: BankDetailsPageProps) {
         {showUpiForm && (
           <form onSubmit={handleAddUpi} className="glass-card rounded-2xl p-4 mb-4 space-y-3">
             {upiError && <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-xs">{upiError}</div>}
-            <input type="text" placeholder="yourname@okhdfcbank" value={upiInput}
-              onChange={(e) => setUpiInput(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#89C4E1] outline-none text-gray-900 bg-white text-sm" />
+
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="yourname@okhdfcbank"
+                value={upiInput}
+                onChange={(e) => setUpiInput(e.target.value)}
+                className={`w-full px-4 py-2.5 pr-10 border rounded-xl focus:ring-2 outline-none text-gray-900 bg-white text-sm ${
+                  upiInput && formatValid
+                    ? "border-green-400 focus:ring-green-300"
+                    : upiInput && !formatValid
+                    ? "border-red-300 focus:ring-red-200"
+                    : "border-gray-200 focus:ring-[#89C4E1]"
+                }`}
+              />
+              {/* Green tick when the format is valid */}
+              {upiInput && formatValid && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500" title="Valid UPI ID">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                </span>
+              )}
+            </div>
+            {upiInput && !formatValid && (
+              <p className="text-xs text-red-500">Enter a valid UPI ID like name@okhdfcbank</p>
+            )}
+
             <div className="flex gap-2">
-              <button type="submit" disabled={verifyingUpi} className="px-5 py-2 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white font-medium rounded-full text-sm disabled:opacity-50">
+              <button
+                type="submit"
+                disabled={verifyingUpi || !formatValid}
+                className="px-5 py-2 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white font-medium rounded-full text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 {verifyingUpi ? "Verifying..." : "Add & Verify"}
               </button>
               <button type="button" onClick={() => setShowUpiForm(false)} className="px-5 py-2 bg-gray-100 text-gray-600 font-medium rounded-full text-sm">Cancel</button>
@@ -232,16 +179,20 @@ export default function BankDetailsPage({ onNavigate }: BankDetailsPageProps) {
           <div className="space-y-3">
             {upis.map((upi) => (
               <div key={upi.id} className="glass-card rounded-2xl p-4 flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-[#2C1810] text-sm">{upi.upiId}</p>
-                  {upi.verified ? (
-                    <span className="text-xs text-green-600 font-medium flex items-center gap-1">✓ Verified</span>
-                  ) : (
-                    <span className="text-xs text-red-500 font-medium">✗ Unverified — please check your UPI ID</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <p className="font-medium text-[#2C1810] text-sm truncate">{upi.upiId}</p>
+                  {upi.verified && (
+                    <span className="text-green-500 flex-shrink-0" title="Verified">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                    </span>
                   )}
                 </div>
-                <div className="flex gap-3">
-                  {!upi.verified && (
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  {upi.verified ? (
+                    <span className="text-xs text-green-600 font-medium">Verified</span>
+                  ) : (
                     <button onClick={() => handleReverifyUpi(upi)} className="text-xs text-[#5EAED4] hover:underline">Re-verify</button>
                   )}
                   <button onClick={() => upi.id && handleDeleteUpi(upi.id)} className="text-xs text-red-500 hover:underline">Remove</button>

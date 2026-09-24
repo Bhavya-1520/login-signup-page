@@ -144,3 +144,47 @@ export async function requestReturnOrReplacement(
     returnReason: reason,
   });
 }
+
+// A customer review surfaced for public display (home page + reviews page)
+export interface PublicReview {
+  orderId: string;
+  customerName: string;
+  productName: string;
+  productImage?: string;
+  rating: number;
+  comment: string;
+  photos: string[];
+  createdAt: Timestamp | Date | null;
+}
+
+// Read all customer reviews across delivered/reviewed orders, newest first.
+export async function getAllReviews(): Promise<PublicReview[]> {
+  if (!db) throw new Error("Firebase not initialized");
+
+  const snapshot = await getDocs(collection(db, "orders"));
+  const reviews: PublicReview[] = [];
+
+  snapshot.docs.forEach((d) => {
+    const order = d.data() as Order;
+    if (order.review && typeof order.review.rating === "number") {
+      const firstItem = order.items?.[0];
+      reviews.push({
+        orderId: d.id,
+        customerName: order.userName || order.deliveryDetails?.name || "Customer",
+        productName: firstItem?.name || "Handcrafted gift",
+        productImage: firstItem?.image,
+        rating: order.review.rating,
+        comment: order.review.comment || "",
+        photos: order.review.photos || [],
+        createdAt: order.review.createdAt || null,
+      });
+    }
+  });
+
+  // Sort newest first
+  return reviews.sort((a, b) => {
+    const dateA = (a.createdAt as any)?.toDate?.() || new Date(a.createdAt as any || 0);
+    const dateB = (b.createdAt as any)?.toDate?.() || new Date(b.createdAt as any || 0);
+    return dateB.getTime() - dateA.getTime();
+  });
+}

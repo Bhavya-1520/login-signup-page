@@ -5,12 +5,13 @@ import { useAuth } from "@/context/AuthContext";
 import { isAdmin } from "@/lib/admin";
 import { getAllOrders, updateOrderStatus, Order } from "@/lib/orders";
 import ProductManager from "./ProductManager";
+import InventoryManager from "./InventoryManager";
 
 interface ManagerDashboardProps {
   onNavigate: (page: string) => void;
 }
 
-type DashboardTab = "orders" | "products";
+type DashboardTab = "orders" | "products" | "inventory";
 
 export default function ManagerDashboard({ onNavigate }: ManagerDashboardProps) {
   const { user, loading: authLoading } = useAuth();
@@ -190,10 +191,23 @@ export default function ManagerDashboard({ onNavigate }: ManagerDashboardProps) 
         >
           🛍️ Products
         </button>
+        <button
+          onClick={() => setActiveTab("inventory")}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+            activeTab === "inventory"
+              ? "bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white shadow-lg"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
+        >
+          📦 Inventory
+        </button>
       </div>
 
       {/* Products Tab */}
       {activeTab === "products" && <ProductManager />}
+
+      {/* Inventory Tab */}
+      {activeTab === "inventory" && <InventoryManager />}
 
       {/* Orders Tab */}
       {activeTab === "orders" && (

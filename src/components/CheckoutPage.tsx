@@ -5,6 +5,7 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { saveOrder } from "@/lib/orders";
 import { getUserAddresses, addAddress, Address } from "@/lib/addresses";
+import { decrementStock } from "@/lib/inventory";
 import PhotoUploader from "./PhotoUploader";
 
 interface CheckoutPageProps {
@@ -27,6 +28,8 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
     note: "",
   });
   const [orderPlaced, setOrderPlaced] = useState(false);
+  // Captured before clearing the cart so the success screen shows the real amount
+  const [placedAmount, setPlacedAmount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
@@ -230,6 +233,11 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                 }),
               });
             } catch {}
+            // Reduce manager inventory for the ordered products
+            try {
+              await decrementStock(items.map((i) => ({ productId: i.productId, quantity: i.quantity })));
+            } catch {}
+            setPlacedAmount(totalPrice);
             setOrderPlaced(true);
             setLoading(false);
             clearCart();
@@ -327,6 +335,11 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
         }),
       });
     } catch {}
+    // Reduce manager inventory for the ordered products
+    try {
+      await decrementStock(items.map((i) => ({ productId: i.productId, quantity: i.quantity })));
+    } catch {}
+    setPlacedAmount(totalPrice);
     setOrderPlaced(true);
     clearCart();
     setLoading(false);
@@ -434,7 +447,7 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
         </p>
         {paymentMethod === "cod" && (
           <p className="text-[#5EAED4] font-medium mb-2">
-            💵 Cash on Delivery — Pay ₹{totalPrice} when you receive your order.
+            💵 Cash on Delivery — Pay ₹{placedAmount} when you receive your order.
           </p>
         )}
         {paymentMethod === "online" && (

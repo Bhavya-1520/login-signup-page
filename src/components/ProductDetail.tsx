@@ -7,6 +7,7 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { trackProductView, getRelatedProducts } from "@/lib/recommendations";
+import { getStock } from "@/lib/inventory";
 import ProductCard from "./ProductCard";
 import PhotoUploader from "./PhotoUploader";
 
@@ -22,6 +23,14 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
   const { user } = useAuth();
   const { isWished, toggle } = useWishlist();
   const [showShare, setShowShare] = useState(false);
+  // Live stock from the manager inventory (undefined = not tracked = always available)
+  const [liveStock, setLiveStock] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    getStock(productId)
+      .then((s) => setLiveStock(s))
+      .catch(() => setLiveStock(undefined));
+  }, [productId]);
 
   useEffect(() => {
     getProducts()
@@ -67,9 +76,20 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
     );
   }
 
+  // Flowers per bouquet: only 1 to 50 accepted (no negatives, no more than 50).
+  const MIN_FLOWERS = 1;
+  const MAX_FLOWERS = 50;
+
   // Inventory + per-order limit. Max 10 per order, and never more than stock.
+  // Live inventory (from the manager Inventory tab) takes priority; fall back to
+  // any stock stored on the product; otherwise treat as not tracked.
   const PER_ORDER_LIMIT = 10;
-  const stock = typeof product.stock === "number" ? product.stock : undefined;
+  const stock =
+    typeof liveStock === "number"
+      ? liveStock
+      : typeof product.stock === "number"
+      ? product.stock
+      : undefined;
   const isOutOfStock = stock === 0;
   const maxQty = stock === undefined ? PER_ORDER_LIMIT : Math.min(PER_ORDER_LIMIT, stock);
 
@@ -328,8 +348,9 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
                 <label className="block text-sm font-medium text-[#3D2B1F] mb-3">Number of Flowers</label>
                 <div className="flex items-center gap-4">
                   <button
-                    onClick={() => setFlowerCount(Math.max(1, flowerCount - 1))}
-                    className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-lg hover:border-pink-300 transition-colors font-medium"
+                    onClick={() => setFlowerCount(Math.max(MIN_FLOWERS, flowerCount - 1))}
+                    disabled={flowerCount <= MIN_FLOWERS}
+                    className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-lg hover:border-pink-300 transition-colors font-medium disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     −
                   </button>
@@ -337,8 +358,9 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
                     {flowerCount}
                   </span>
                   <button
-                    onClick={() => setFlowerCount(flowerCount + 1)}
-                    className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-lg hover:border-pink-300 transition-colors font-medium"
+                    onClick={() => setFlowerCount(Math.min(MAX_FLOWERS, flowerCount + 1))}
+                    disabled={flowerCount >= MAX_FLOWERS}
+                    className="w-11 h-11 rounded-full glass-card flex items-center justify-center text-lg hover:border-pink-300 transition-colors font-medium disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     +
                   </button>
@@ -346,6 +368,11 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
                 <p className="text-sm text-gray-400 mt-2">
                   1 flower = ₹199, each additional +₹100
                 </p>
+                {flowerCount >= MAX_FLOWERS && (
+                  <p className="text-sm text-amber-600 font-medium mt-1">
+                    Maximum {MAX_FLOWERS} flowers per bouquet
+                  </p>
+                )}
               </div>
             )}
 

@@ -1,12 +1,28 @@
 "use client";
+"use client";
 
+import { useEffect, useState } from "react";
 import HeroCarousel from "./HeroCarousel";
+import { getAllReviews, PublicReview } from "@/lib/orders";
 
 interface HomePageProps {
   onNavigate: (page: string) => void;
 }
 
 export default function HomePage({ onNavigate }: HomePageProps) {
+  const [reviews, setReviews] = useState<PublicReview[]>([]);
+
+  useEffect(() => {
+    getAllReviews()
+      .then((r) => setReviews(r.slice(0, 3)))
+      .catch(() => {});
+  }, []);
+
+  const renderStars = (rating: number) => {
+    const full = Math.max(0, Math.min(5, Math.round(rating)));
+    return "★".repeat(full) + "☆".repeat(5 - full);
+  };
+
   return (
     <div>
       {/* Hero Carousel */}
@@ -24,9 +40,6 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               Raksha Bandhan Special — Premium Horse + Letter starting at just ₹499!
             </p>
           </div>
-          <p className="text-gray-600 text-sm mt-1">
-            Order before Aug 25th for guaranteed delivery
-          </p>
           <button
             onClick={() => onNavigate("raksha-bandhan")}
             className="mt-4 px-6 py-2.5 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white font-semibold rounded-full text-sm hover:shadow-lg transition-all"
@@ -166,32 +179,60 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Review 1 */}
-            <div className="glass-card rounded-2xl p-5 hover:shadow-lg transition-shadow">
-              <div className="text-yellow-400 text-base mb-2">★★★★★</div>
-              <p className="text-gray-600 text-sm leading-relaxed mb-3">
-                &quot;The Raksha Bandhan horse combo was a hit! My brother loved it. Quality is amazing 😍&quot;
-              </p>
-              <p className="font-semibold text-[#2C1810] text-sm">— Priya S. <span className="text-[#5EAED4]">✓</span></p>
-            </div>
+            {reviews.length > 0 ? (
+              reviews.map((r, idx) => (
+                <div key={r.orderId + idx} className="glass-card rounded-2xl p-5 hover:shadow-lg transition-shadow">
+                  <div className="text-yellow-400 text-base mb-2">{renderStars(r.rating)}</div>
+                  {r.comment && (
+                    <p className="text-gray-600 text-sm leading-relaxed mb-3">&quot;{r.comment}&quot;</p>
+                  )}
+                  {r.photos && r.photos.length > 0 && (
+                    <div className="flex gap-2 flex-wrap mb-3">
+                      {r.photos.slice(0, 3).map((p, i) => (
+                        <img key={i} src={p} alt="review" className="w-12 h-12 rounded-lg object-cover border border-gray-100" />
+                      ))}
+                    </div>
+                  )}
+                  <p className="font-semibold text-[#2C1810] text-sm">— {r.customerName} <span className="text-[#5EAED4]">✓</span></p>
+                  <p className="text-xs text-gray-400">{r.productName}</p>
+                </div>
+              ))
+            ) : (
+              <>
+                {/* Sample reviews shown until real customer reviews come in */}
+                <div className="glass-card rounded-2xl p-5 hover:shadow-lg transition-shadow">
+                  <div className="text-yellow-400 text-base mb-2">★★★★★</div>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-3">
+                    &quot;The Raksha Bandhan horse combo was a hit! My brother loved it. Quality is amazing 😍&quot;
+                  </p>
+                  <p className="font-semibold text-[#2C1810] text-sm">— Priya S. <span className="text-[#5EAED4]">✓</span></p>
+                </div>
+                <div className="glass-card rounded-2xl p-5 hover:shadow-lg transition-shadow">
+                  <div className="text-yellow-400 text-base mb-2">★★★★★</div>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-3">
+                    &quot;Beautiful sunflower bouquet, same as the picture on the website. Thank you for making my wife&apos;s day special!&quot;
+                  </p>
+                  <p className="font-semibold text-[#2C1810] text-sm">— Rahul M. <span className="text-[#5EAED4]">✓</span></p>
+                </div>
+                <div className="glass-card rounded-2xl p-5 hover:shadow-lg transition-shadow">
+                  <div className="text-yellow-400 text-base mb-2">★★★★★</div>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-3">
+                    &quot;Lovely pipe cleaner bouquet! The colors were exactly what I asked for. Will order again for sure.&quot;
+                  </p>
+                  <p className="font-semibold text-[#2C1810] text-sm">— Ananya K. <span className="text-[#5EAED4]">✓</span></p>
+                </div>
+              </>
+            )}
+          </div>
 
-            {/* Review 2 */}
-            <div className="glass-card rounded-2xl p-5 hover:shadow-lg transition-shadow">
-              <div className="text-yellow-400 text-base mb-2">★★★★★</div>
-              <p className="text-gray-600 text-sm leading-relaxed mb-3">
-                &quot;Beautiful sunflower bouquet, same as the picture on the website. Thank you for making my wife&apos;s day special!&quot;
-              </p>
-              <p className="font-semibold text-[#2C1810] text-sm">— Rahul M. <span className="text-[#5EAED4]">✓</span></p>
-            </div>
-
-            {/* Review 3 */}
-            <div className="glass-card rounded-2xl p-5 hover:shadow-lg transition-shadow">
-              <div className="text-yellow-400 text-base mb-2">★★★★★</div>
-              <p className="text-gray-600 text-sm leading-relaxed mb-3">
-                &quot;Lovely pipe cleaner bouquet! The colors were exactly what I asked for. Will order again for sure.&quot;
-              </p>
-              <p className="font-semibold text-[#2C1810] text-sm">— Ananya K. <span className="text-[#5EAED4]">✓</span></p>
-            </div>
+          {/* See more reviews */}
+          <div className="text-center mt-8">
+            <button
+              onClick={() => onNavigate("reviews")}
+              className="px-6 py-2.5 border-2 border-[#89C4E1] text-[#5EAED4] font-medium rounded-full text-sm hover:bg-sky-50 transition-all"
+            >
+              See more reviews →
+            </button>
           </div>
         </div>
       </section>

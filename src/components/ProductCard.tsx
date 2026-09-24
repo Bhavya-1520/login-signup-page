@@ -17,6 +17,7 @@ interface ProductCardProps {
     pricePerExtra?: number;
   };
   onNavigate: (page: string) => void;
+  outOfStock?: boolean;
 }
 
 const productEmojis: Record<string, string> = {
@@ -29,7 +30,7 @@ const productEmojis: Record<string, string> = {
   "raksha-bandhan-combo": "🎀",
 };
 
-export default function ProductCard({ product, onNavigate }: ProductCardProps) {
+export default function ProductCard({ product, onNavigate, outOfStock }: ProductCardProps) {
   const { getItemByProductId } = useCart();
   const { isWished, toggle } = useWishlist();
   const wished = isWished(product.id);
@@ -127,12 +128,21 @@ export default function ProductCard({ product, onNavigate }: ProductCardProps) {
           </svg>
         </button>
 
-        {product.category === "Raksha Bandhan" && (
+        {/* Out of stock overlay */}
+        {outOfStock && (
+          <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-10">
+            <span className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow">
+              Out of Stock
+            </span>
+          </div>
+        )}
+
+        {product.category === "Raksha Bandhan" && !outOfStock && (
           <div className="absolute top-2 left-2 bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white text-[10px] font-bold px-2 py-1 rounded-full shadow">
             ✨ SPECIAL
           </div>
         )}
-        {inCart && (
+        {inCart && !outOfStock && (
           <div className="absolute bottom-2 left-2 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow flex items-center gap-1">
             ✓ In Cart
           </div>

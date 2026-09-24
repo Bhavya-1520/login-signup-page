@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { products as fallbackProducts } from "@/lib/products";
 import { getProducts, categoryToGroup } from "@/lib/productsDB";
+import { getInventoryMap, InventoryMap } from "@/lib/inventory";
 import ProductCard from "./ProductCard";
 
 // Display groups with friendly labels
@@ -22,6 +23,7 @@ interface ProductsPageProps {
 export default function ProductsPage({ onNavigate, initialCategory }: ProductsPageProps) {
   const [selectedCategory, setSelectedCategory] = useState(initialCategory || "All");
   const [products, setProducts] = useState<any[]>(fallbackProducts);
+  const [inventory, setInventory] = useState<InventoryMap>({});
   const [loading, setLoading] = useState(true);
 
   // Update selected category when navigating between categories
@@ -46,6 +48,11 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
         setProducts(fallbackProducts);
         setLoading(false);
       });
+
+    // Load live inventory so we can flag out-of-stock products
+    getInventoryMap()
+      .then((map) => setInventory(map))
+      .catch(() => setInventory({}));
   }, []);
 
   const filteredProducts =
@@ -93,7 +100,11 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
           {filteredProducts.map((product) => (
             <div key={product.id} className="break-inside-avoid mb-6">
-              <ProductCard product={product} onNavigate={onNavigate} />
+              <ProductCard
+                product={product}
+                onNavigate={onNavigate}
+                outOfStock={inventory[product.id] === 0}
+              />
             </div>
           ))}
         </div>

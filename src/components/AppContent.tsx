@@ -17,12 +17,12 @@ import OrdersPage from "./OrdersPage";
 import ManagerDashboard from "./ManagerDashboard";
 import AccountPage from "./AccountPage";
 import AddressesPage from "./AddressesPage";
-import SettingsPage from "./SettingsPage";
 import SearchResultsPage from "./SearchResultsPage";
 import BankDetailsPage from "./BankDetailsPage";
 import BottomNav from "./BottomNav";
 import WishlistPage from "./WishlistPage";
 import ImageSearchPage from "./ImageSearchPage";
+import ReviewsPage from "./ReviewsPage";
 
 // Map internal page ids to URL path segments
 function pageToPath(page: string): string {
@@ -39,10 +39,10 @@ function pageToPath(page: string): string {
     manager: "/home/dashboard",
     account: "/home/account",
     addresses: "/home/addresses",
-    settings: "/home/settings",
     "bank-details": "/home/bank-details",
     wishlist: "/home/wishlist",
     "image-search": "/home/image-search",
+    reviews: "/home/reviews",
     about: "/home/about",
     contact: "/home/contact",
     login: "/",
@@ -64,8 +64,8 @@ function pathToPage(path: string): string {
     "/home/dashboard": "manager",
     "/home/account": "account",
     "/home/addresses": "addresses",
-    "/home/settings": "settings",
     "/home/bank-details": "bank-details",
+    "/home/reviews": "reviews",
     "/home/about": "about",
     "/home/contact": "contact",
     "/home/search": "search-",
@@ -199,14 +199,14 @@ function GatedApp() {
         return <AccountPage onNavigate={handleNavigate} />;
       case "addresses":
         return <AddressesPage onNavigate={handleNavigate} />;
-      case "settings":
-        return <AccountPage onNavigate={handleNavigate} />;
       case "bank-details":
         return <BankDetailsPage onNavigate={handleNavigate} />;
       case "wishlist":
         return <WishlistPage onNavigate={handleNavigate} />;
       case "image-search":
         return <ImageSearchPage onNavigate={handleNavigate} />;
+      case "reviews":
+        return <ReviewsPage onNavigate={handleNavigate} />;
       case "about":
         return <AboutPage />;
       case "contact":
