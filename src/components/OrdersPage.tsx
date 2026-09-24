@@ -20,6 +20,7 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
+  const [videos, setVideos] = useState<string[]>([]);
   const [savingFeedback, setSavingFeedback] = useState(false);
 
   // Return/replacement modal state
@@ -78,6 +79,24 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
     });
   };
 
+  const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).slice(0, 2).forEach((file) => {
+      // Keep videos small so they fit in the order document (~5MB cap)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Please upload a short video under 5 MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        setVideos((prev) => [...prev, reader.result as string].slice(0, 2));
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
+  };
+
   const handleSubmitFeedback = async () => {
     if (!feedbackOrder?.id || rating === 0) {
       alert("Please give a star rating");
@@ -85,12 +104,12 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
     }
     setSavingFeedback(true);
     try {
-      await saveOrderReview(feedbackOrder.id, { rating, comment, photos });
+      await saveOrderReview(feedbackOrder.id, { rating, comment, photos, videos });
       setOrders((prev) => prev.map((o) => o.id === feedbackOrder.id
-        ? { ...o, review: { rating, comment, photos, createdAt: new Date() } }
+        ? { ...o, review: { rating, comment, photos, videos, createdAt: new Date() } }
         : o));
       setFeedbackOrder(null);
-      setRating(0); setComment(""); setPhotos([]);
+      setRating(0); setComment(""); setPhotos([]); setVideos([]);
     } catch {
       alert("Failed to save feedback");
     }
@@ -295,6 +314,13 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
                           ))}
                         </div>
                       )}
+                      {order.review.videos && order.review.videos.length > 0 && (
+                        <div className="flex gap-2 mt-2">
+                          {order.review.videos.map((v, i) => (
+                            <video key={i} src={v} controls className="w-24 h-16 rounded-lg object-cover bg-black" />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -312,7 +338,7 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
 
                     {/* After delivery: feedback + return/replacement */}
                     {isDelivered && !order.review && (
-                      <button onClick={() => { setFeedbackOrder(order); setRating(0); setComment(""); setPhotos([]); }} className="px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white">
+                      <button onClick={() => { setFeedbackOrder(order); setRating(0); setComment(""); setPhotos([]); setVideos([]); }} className="px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white">
                         ⭐ Give Feedback
                       </button>
                     )}
@@ -360,13 +386,53 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
                   </div>
                 ))}
                 {photos.length < 4 && (
-                  <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-[#89C4E1]">
-                    <span className="text-2xl text-gray-400">📷</span>
-                    <input type="file" accept="image/*" capture="environment" multiple onChange={handlePhotoUpload} className="hidden" />
-                  </label>
+                  <>
+                    {/* Camera */}
+                    <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#89C4E1]" title="Take a photo">
+                      <span className="text-xl text-gray-400">📷</span>
+                      <span className="text-[9px] text-gray-400">Camera</span>
+                      <input type="file" accept="image/*" capture="environment" onChange={handlePhotoUpload} className="hidden" />
+                    </label>
+                    {/* Gallery */}
+                    <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#89C4E1]" title="Upload from gallery">
+                      <span className="text-xl text-gray-400">🖼️</span>
+                      <span className="text-[9px] text-gray-400">Upload</span>
+                      <input type="file" accept="image/*" multiple onChange={handlePhotoUpload} className="hidden" />
+                    </label>
+                  </>
                 )}
               </div>
-              <p className="text-xs text-gray-400 mt-1">Tap to take a photo or upload from gallery (up to 4)</p>
+              <p className="text-xs text-gray-400 mt-1">Take a photo or upload from gallery (up to 4)</p>
+            </div>
+
+            {/* Video upload */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Add Video (optional)</label>
+              <div className="flex gap-2 flex-wrap">
+                {videos.map((v, i) => (
+                  <div key={i} className="relative w-24 h-16">
+                    <video src={v} className="w-full h-full rounded-lg object-cover bg-black" controls />
+                    <button onClick={() => setVideos(videos.filter((_, idx) => idx !== i))} className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs">×</button>
+                  </div>
+                ))}
+                {videos.length < 2 && (
+                  <>
+                    {/* Record video */}
+                    <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#89C4E1]" title="Record a video">
+                      <span className="text-xl text-gray-400">🎥</span>
+                      <span className="text-[9px] text-gray-400">Record</span>
+                      <input type="file" accept="video/*" capture="environment" onChange={handleVideoUpload} className="hidden" />
+                    </label>
+                    {/* Upload video */}
+                    <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#89C4E1]" title="Upload a video">
+                      <span className="text-xl text-gray-400">📹</span>
+                      <span className="text-[9px] text-gray-400">Upload</span>
+                      <input type="file" accept="video/*" onChange={handleVideoUpload} className="hidden" />
+                    </label>
+                  </>
+                )}
+              </div>
+              <p className="text-xs text-gray-400 mt-1">Short clips under 5 MB (up to 2)</p>
             </div>
 
             <div className="flex gap-3">

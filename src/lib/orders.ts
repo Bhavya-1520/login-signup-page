@@ -26,6 +26,7 @@ export interface OrderReview {
   rating: number;
   comment: string;
   photos: string[];
+  videos?: string[];
   createdAt: Timestamp | Date;
 }
 
@@ -122,7 +123,7 @@ export async function cancelOrder(orderId: string): Promise<void> {
 // Save a product review/feedback for a delivered order
 export async function saveOrderReview(
   orderId: string,
-  review: { rating: number; comment: string; photos: string[] }
+  review: { rating: number; comment: string; photos: string[]; videos?: string[] }
 ): Promise<void> {
   if (!db) throw new Error("Firebase not initialized");
   const orderRef = doc(db, "orders", orderId);

@@ -15,6 +15,9 @@ interface ProductCardProps {
     image: string;
     images?: string[];
     pricePerExtra?: number;
+    requiresPhotos?: boolean;
+    sizes?: { label: string; price: number }[];
+    variants?: { label: string; priceAdjust: number }[];
   };
   onNavigate: (page: string) => void;
   outOfStock?: boolean;
@@ -31,9 +34,43 @@ const productEmojis: Record<string, string> = {
 };
 
 export default function ProductCard({ product, onNavigate, outOfStock }: ProductCardProps) {
-  const { getItemByProductId } = useCart();
+  const { getItemByProductId, addItem, removeItem } = useCart();
   const { isWished, toggle } = useWishlist();
   const wished = isWished(product.id);
+
+  // Products that need customer choices before ordering must open the detail page.
+  const needsChoices =
+    !!product.requiresPhotos ||
+    (product.sizes && product.sizes.length > 0) ||
+    (product.variants && product.variants.length > 0) ||
+    !!product.pricePerExtra;
+
+  const handleCartButton = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (outOfStock) return;
+    // If it needs choices (photos/size/variant/flowers), go to the detail page
+    if (needsChoices) {
+      onNavigate(`product-${product.id}`);
+      return;
+    }
+    // Simple product — toggle add/remove directly from the card
+    const existing = getItemByProductId(product.id);
+    if (existing) {
+      removeItem(existing.id);
+    } else {
+      addItem({
+        id: `${product.id}-${Date.now()}`,
+        productId: product.id,
+        name: product.name,
+        price: product.basePrice,
+        quantity: 1,
+        size: "",
+        colors: "",
+        customNote: "",
+        image: product.image,
+      });
+    }
+  };
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -160,7 +197,7 @@ export default function ProductCard({ product, onNavigate, outOfStock }: Product
         <p className="text-gray-400 text-xs sm:text-sm mt-1 line-clamp-2">
           {product.description}
         </p>
-        <div className="mt-4 flex items-center justify-between">
+        <div className="mt-3 flex items-center justify-between">
           <span className="text-[#5EAED4] font-bold text-base sm:text-lg">
             ₹{product.basePrice}
             {product.pricePerExtra && <span className="text-xs sm:text-sm font-normal text-gray-400"> onwards</span>}
@@ -169,6 +206,29 @@ export default function ProductCard({ product, onNavigate, outOfStock }: Product
             View →
           </span>
         </div>
+
+        {/* Action button */}
+        <button
+          onClick={handleCartButton}
+          disabled={outOfStock}
+          className={`mt-3 w-full py-2.5 rounded-full text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+            product.requiresPhotos
+              ? "bg-white border-2 border-[#E8A0BF] text-[#C77DA5] hover:bg-pink-50"
+              : inCart
+              ? "bg-green-50 border-2 border-green-400 text-green-600 hover:bg-red-50 hover:border-red-300 hover:text-red-500"
+              : "bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white hover:shadow-lg"
+          }`}
+        >
+          {outOfStock
+            ? "Out of Stock"
+            : product.requiresPhotos
+            ? "🎨 Customise"
+            : needsChoices
+            ? "🛒 Add to Cart"
+            : inCart
+            ? "✓ In Cart — Remove"
+            : "🛒 Add to Cart"}
+        </button>
       </div>
     </div>
   );
