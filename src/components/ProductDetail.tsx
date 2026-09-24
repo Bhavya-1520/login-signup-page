@@ -441,13 +441,9 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
                 </span>
               </div>
 
-              {/* Stock messaging */}
+              {/* Stock messaging — only reveal Out of Stock, never the exact count */}
               {isOutOfStock ? (
                 <p className="text-sm text-red-500 font-medium mt-2">Out of stock</p>
-              ) : stock !== undefined && stock <= 10 ? (
-                <p className="text-sm text-amber-600 font-medium mt-2">
-                  Only {stock} left — you can order up to {maxQty}
-                </p>
               ) : (
                 <p className="text-xs text-gray-400 mt-2">Maximum {PER_ORDER_LIMIT} per order</p>
               )}
