@@ -76,8 +76,22 @@ export async function deleteUpiDetail(id: string): Promise<void> {
   await deleteDoc(doc(db, "upiDetails", id));
 }
 
-// Validate UPI ID format (basic check: something@handle)
+// Validate UPI ID format.
+// A UPI ID (VPA) is `identifier@handle`:
+//  - identifier: a valid 10-digit Indian mobile number (starts 6-9) OR a username
+//  - handle: 2+ letters, optionally with digits (e.g. axl, ybl, okhdfcbank, paytm)
+// Examples that must pass: 9346630240@axl, yourname@okhdfcbank, john.doe@ybl
+// Must fail: 9898983309940@axl (13 digits — not a real phone number)
 export function isValidUpiFormat(upiId: string): boolean {
-  const regex = /^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$/;
-  return regex.test(upiId);
+  const id = upiId.trim();
+  const structure = /^([a-zA-Z0-9][a-zA-Z0-9.\-_]{1,})@([a-zA-Z][a-zA-Z0-9]{1,})$/;
+  const match = id.match(structure);
+  if (!match) return false;
+
+  const prefix = match[1];
+  // If the prefix is all digits, it must be a valid 10-digit Indian mobile number.
+  if (/^\d+$/.test(prefix)) {
+    return /^[6-9]\d{9}$/.test(prefix);
+  }
+  return true;
 }

@@ -46,6 +46,12 @@ export default function BankDetailsPage({ onNavigate }: BankDetailsPageProps) {
       return;
     }
 
+    // Prevent duplicates
+    if (upis.some((u) => u.upiId.toLowerCase() === upiId.toLowerCase())) {
+      setUpiError("This UPI ID is already saved.");
+      return;
+    }
+
     setVerifyingUpi(true);
     try {
       const res = await fetch("/api/upi/verify", {
@@ -55,13 +61,15 @@ export default function BankDetailsPage({ onNavigate }: BankDetailsPageProps) {
       });
       const data = await res.json();
 
-      // Save to Firebase regardless, storing the verified flag
-      const id = await addUpiDetail({ userId: user.uid, upiId, verified: !!data.verified });
-      setUpis((prev) => [...prev, { id, userId: user.uid, upiId, verified: !!data.verified }]);
-
+      // Only save if it's actually valid — reject invalid UPI IDs
       if (!data.verified) {
-        setUpiError(data.error || "Could not verify this UPI ID. Please double-check it.");
+        setUpiError(data.error || "This UPI ID is invalid. Please check and try again.");
+        setVerifyingUpi(false);
+        return;
       }
+
+      const id = await addUpiDetail({ userId: user.uid, upiId, verified: true });
+      setUpis((prev) => [...prev, { id, userId: user.uid, upiId, verified: true }]);
       setUpiInput("");
       setShowUpiForm(false);
     } catch {

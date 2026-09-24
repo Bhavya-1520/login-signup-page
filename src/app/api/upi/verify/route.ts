@@ -6,11 +6,25 @@ import { NextRequest, NextResponse } from "next/server";
 // check and structural validation. Once your Razorpay account is live, this
 // can be upgraded to call Razorpay's /payments/validate/vpa endpoint.
 
+// Common UPI handles across apps/banks. This is used to recognise well-known
+// providers; a well-formed ID with an unlisted handle is still accepted.
 const VALID_UPI_HANDLES = [
-  "okhdfcbank", "okaxis", "oksbi", "okicici", "ybl", "ibl", "axl",
-  "paytm", "apl", "upi", "gpay", "phonepe", "hdfcbank", "sbi", "icici",
-  "axisbank", "kotak", "yesbank", "federal", "pnb", "barodampay", "cnrb",
-  "idfcbank", "indianbank", "airtel", "freecharge", "jupiteraxis",
+  // Google Pay
+  "okhdfcbank", "okaxis", "oksbi", "okicici",
+  // PhonePe
+  "ybl", "ibl", "axl", "yesbank", "hdfcbank",
+  // Paytm
+  "paytm", "ptaxis", "ptsbi", "ptyes", "pthdfc", "pticici",
+  // Amazon Pay
+  "apl", "yapl", "rapl",
+  // BHIM / generic
+  "upi",
+  // Banks
+  "sbi", "icici", "axisbank", "kotak", "federal", "pnb", "barodampay",
+  "cnrb", "idfcbank", "indianbank", "unionbank", "idbi", "uco", "citi",
+  "dbs", "rbl", "sib", "iob", "cbin", "boi", "kbl", "dlb",
+  // Fintech
+  "airtel", "freecharge", "jupiteraxis", "fam", "slc", "naviaxis", "wahdfcbank",
 ];
 
 export async function POST(request: NextRequest) {
@@ -21,25 +35,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ verified: false, error: "UPI ID is required" }, { status: 400 });
     }
 
-    // Format check: prefix@handle
-    const formatRegex = /^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$/;
-    if (!formatRegex.test(upiId)) {
+    const trimmed = upiId.trim();
+
+    // Format check: identifier@handle (e.g. 9346630240@axl, name@okhdfcbank)
+    const formatRegex = /^([a-zA-Z0-9][a-zA-Z0-9.\-_]{1,})@([a-zA-Z][a-zA-Z0-9]{1,})$/;
+    const match = trimmed.match(formatRegex);
+    if (!match) {
       return NextResponse.json({
         verified: false,
-        error: "Invalid UPI format. It should look like name@bank (e.g. yourname@okhdfcbank)",
+        error: "Invalid UPI format. It should look like name@bank (e.g. 9346630240@axl)",
       });
     }
 
-    // Handle validity check
-    const handle = upiId.split("@")[1].toLowerCase();
+    // If the prefix is purely numeric, it must be a valid 10-digit Indian mobile number.
+    const prefix = match[1];
+    if (/^\d+$/.test(prefix) && !/^[6-9]\d{9}$/.test(prefix)) {
+      return NextResponse.json({
+        verified: false,
+        error: "Invalid mobile number in UPI ID. It must be a valid 10-digit number (e.g. 9346630240@axl).",
+      });
+    }
+
+    const handle = trimmed.split("@")[1].toLowerCase();
     const isKnownHandle = VALID_UPI_HANDLES.includes(handle);
-
-    if (!isKnownHandle) {
-      return NextResponse.json({
-        verified: false,
-        error: `"@${handle}" is not a recognized UPI provider. Please check your UPI ID.`,
-      });
-    }
 
     // Try Razorpay VPA validation if account supports it
     try {
@@ -53,7 +71,7 @@ export async function POST(request: NextRequest) {
             "Content-Type": "application/json",
             Authorization: `Basic ${auth}`,
           },
-          body: JSON.stringify({ vpa: upiId }),
+          body: JSON.stringify({ vpa: trimmed }),
         });
         const data = await res.json();
         if (res.ok && data.success) {
@@ -65,8 +83,10 @@ export async function POST(request: NextRequest) {
       // Fall through to format-based success
     }
 
-    // Format + known handle passed (test mode)
-    return NextResponse.json({ verified: true });
+    // Well-formed UPI ID. We accept it (real name lookup needs a live Razorpay
+    // account). Known handles are marked fully verified; uncommon-but-valid
+    // handles are still accepted so real IDs are never wrongly rejected.
+    return NextResponse.json({ verified: true, knownHandle: isKnownHandle });
   } catch (error: any) {
     console.error("UPI verify error:", error.message);
     return NextResponse.json({ verified: false, error: "Verification failed" }, { status: 500 });
