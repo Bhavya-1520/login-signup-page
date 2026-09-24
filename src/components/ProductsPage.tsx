@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { products as fallbackProducts } from "@/lib/products";
 import { getProducts, categoryToGroup } from "@/lib/productsDB";
 import { getInventoryMap, InventoryMap } from "@/lib/inventory";
+import { getProductRatings, RatingSummary } from "@/lib/orders";
 import ProductCard from "./ProductCard";
 
 // Display groups with friendly labels
@@ -24,6 +25,7 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
   const [selectedCategory, setSelectedCategory] = useState(initialCategory || "All");
   const [products, setProducts] = useState<any[]>(fallbackProducts);
   const [inventory, setInventory] = useState<InventoryMap>({});
+  const [ratings, setRatings] = useState<Record<string, RatingSummary>>({});
   const [loading, setLoading] = useState(true);
 
   // Update selected category when navigating between categories
@@ -53,6 +55,11 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
     getInventoryMap()
       .then((map) => setInventory(map))
       .catch(() => setInventory({}));
+
+    // Load per-product rating summaries for the star display on cards
+    getProductRatings()
+      .then((r) => setRatings(r))
+      .catch(() => setRatings({}));
   }, []);
 
   const filteredProducts =
@@ -104,6 +111,7 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
                 product={product}
                 onNavigate={onNavigate}
                 outOfStock={inventory[product.id] === 0}
+                rating={ratings[product.id]}
               />
             </div>
           ))}

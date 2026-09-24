@@ -11,8 +11,9 @@ async function loadModel() {
       const tf = await import("@tensorflow/tfjs");
       await tf.ready();
       const mobilenet = await import("@tensorflow-models/mobilenet");
-      // Use the smaller/faster model version (0.25 width, 224 input)
-      return mobilenet.load({ version: 1, alpha: 0.25 });
+      // Use the full-accuracy model (alpha 1.0) so labels are far more reliable.
+      // It is a bit larger, but classification quality matters most here.
+      return mobilenet.load({ version: 2, alpha: 1.0 });
     })();
   }
   return modelPromise;
@@ -26,12 +27,41 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   ]);
 }
 
-// Keywords from MobileNet predictions mapped to our product groups
+// MobileNet returns specific ImageNet class names. We map a broad set of those
+// (and general words) to our product groups so real photos classify correctly.
 const keywordToGroup: { keywords: string[]; group: string }[] = [
-  { keywords: ["flower", "bouquet", "vase", "daisy", "sunflower", "rose", "petal", "pot", "plant", "bloom"], group: "Bouquets" },
-  { keywords: ["horse", "pony", "stallion", "toy", "figurine"], group: "Rakhi" },
-  { keywords: ["bangle", "bracelet", "ring", "jewelry", "jewellery", "necklace", "gem", "resin"], group: "Resin" },
-  { keywords: ["book", "magazine", "envelope", "card", "paper", "gift", "box", "basket", "hamper", "magnet"], group: "Birthday" },
+  {
+    group: "Bouquets",
+    keywords: [
+      "flower", "bouquet", "vase", "daisy", "sunflower", "rose", "petal", "pot", "plant",
+      "bloom", "blossom", "hip", "rosehip", "yellow lady's slipper", "picket fence",
+      "corn", "cardoon", "buckeye", "bee", "greenhouse", "florist", "arrangement",
+    ],
+  },
+  {
+    group: "Rakhi",
+    keywords: [
+      "horse", "pony", "stallion", "sorrel", "arabian", "hobby", "rocking horse", "toyshop",
+      "toy", "figurine", "carousel", "merry-go-round", "unicorn", "colt", "mare",
+      "dalmatian", "zebra", "camel",
+    ],
+  },
+  {
+    group: "Resin",
+    keywords: [
+      "bangle", "bracelet", "ring", "jewelry", "jewellery", "necklace", "gem", "resin",
+      "bead", "chain", "hoopskirt", "buckle", "prayer", "rosary", "pendant", "loupe",
+    ],
+  },
+  {
+    group: "Birthday",
+    keywords: [
+      "book", "magazine", "envelope", "card", "paper", "gift", "box", "basket", "hamper",
+      "magnet", "packet", "carton", "wrapping", "birthday", "cake", "candle", "notebook",
+      "binder", "menu", "comic", "photograph", "picture frame", "refrigerator", "mug",
+      "coffee mug", "cup", "chocolate",
+    ],
+  },
 ];
 
 export interface ImageSearchResult {
@@ -41,13 +71,15 @@ export interface ImageSearchResult {
 }
 
 export async function searchByImage(imgElement: HTMLImageElement): Promise<ImageSearchResult> {
-  // Load model with a 15s timeout so it never hangs forever
-  const model = await withTimeout(loadModel(), 15000);
-  const predictions: { className: string; probability: number }[] = await withTimeout(model.classify(imgElement, 5), 8000);
+  // Load model with a 20s timeout so it never hangs forever
+  const model = await withTimeout(loadModel(), 20000);
+  const predictions: { className: string; probability: number }[] =
+    await withTimeout(model.classify(imgElement, 10), 12000);
 
-  const labels = predictions.map((p) => p.className.toLowerCase());
+  const labels = predictions.map((p) => p.className);
 
-  // Score each group by how many prediction keywords match
+  // Score each group by how strongly its keywords match the predictions.
+  // Each MobileNet label may be comma-separated (e.g. "sorrel, horse").
   const groupScores: Record<string, number> = {};
   for (const pred of predictions) {
     const text = pred.className.toLowerCase();
@@ -70,11 +102,13 @@ export async function searchByImage(imgElement: HTMLImageElement): Promise<Image
 
   const matchedProducts = bestGroup
     ? products.filter((p) => (p.group || p.category) === bestGroup)
-    : [];
+    : // No confident group match — show everything so the customer still gets
+      // browsable results instead of a dead-end "no results" screen.
+      products;
 
   return {
     group: bestGroup,
-    labels: predictions.map((p) => p.className),
+    labels,
     matchedProducts,
   };
 }

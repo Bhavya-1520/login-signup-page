@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -13,11 +13,11 @@ interface NavbarProps {
 }
 
 const categories = [
-  { label: "All", icon: "🛍️", group: "All" },
-  { label: "Bouquets", icon: "💐", group: "Bouquets" },
-  { label: "Rakhi Gifts", icon: "🎀", group: "Rakhi" },
-  { label: "Resin Arts", icon: "💍", group: "Resin" },
-  { label: "Birthday", icon: "🎂", group: "Birthday" },
+  { label: "ALL", image: "/images/ALL.jpeg", group: "All" },
+  { label: "BOQUETS", image: "/images/Boquets.jpeg", group: "Bouquets" },
+  { label: "RAKHI", image: "/images/Rakhi.jpeg", group: "Rakhi" },
+  { label: "RESINARTS", image: "/images/Resin.jpeg", group: "Resin" },
+  { label: "BIRTHDAYGIFTS", image: "/images/BirthdayGifts.jpeg", group: "Birthday" },
 ];
 
 export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
@@ -25,6 +25,23 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
   const { count: wishlistCount } = useWishlist();
   const { user, logout } = useAuth();
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close the profile menu when tapping/clicking outside of it
+  useEffect(() => {
+    if (!accountMenuOpen) return;
+    const handleClickOutside = (e: Event) => {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(e.target as Node)) {
+        setAccountMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [accountMenuOpen]);
 
   const initial = (user?.displayName || user?.email || "U").charAt(0).toUpperCase();
 
@@ -36,7 +53,7 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
           {/* LEFT: Profile */}
           <div className="flex items-center flex-shrink-0">
             {user ? (
-              <div className="relative">
+              <div className="relative" ref={accountMenuRef}>
                 <button
                   onClick={() => setAccountMenuOpen(!accountMenuOpen)}
                   className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[#89C4E1] to-[#F8C8DC] text-white font-bold text-sm flex items-center justify-center hover:shadow-lg transition-all"
@@ -45,10 +62,13 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
                 </button>
                 {accountMenuOpen && (
                   <div className="absolute left-0 top-11 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
-                    <div className="px-4 pb-2 border-b border-gray-100">
+                    <button
+                      onClick={() => { onNavigate("account"); setAccountMenuOpen(false); }}
+                      className="w-full text-left px-4 pb-2 border-b border-gray-100 hover:bg-sky-50 transition-colors"
+                    >
                       <p className="text-sm font-semibold text-[#2C1810] truncate">{user.displayName || "User"}</p>
                       <p className="text-xs text-gray-400 truncate">{user.email}</p>
-                    </div>
+                    </button>
                     <button onClick={() => { onNavigate("account"); setAccountMenuOpen(false); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-sky-50 flex items-center gap-2">👤 My Account</button>
                     <button onClick={() => { onNavigate("orders"); setAccountMenuOpen(false); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-sky-50 flex items-center gap-2">📦 My Orders</button>
                     <button onClick={() => { onNavigate("addresses"); setAccountMenuOpen(false); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-sky-50 flex items-center gap-2">📍 Saved Addresses</button>
@@ -103,18 +123,18 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
           <SearchBar onNavigate={onNavigate} compact />
         </div>
 
-        {/* Category strip */}
-        <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+        {/* Category strip — 5 items across one line, edge to edge */}
+        <div className="flex pb-2">
           {categories.map((c) => (
             <button
               key={c.label}
               onClick={() => onNavigate(c.group === "All" ? "products" : `category-${c.group}`)}
-              className="flex flex-col items-center gap-1 flex-shrink-0 w-14"
+              className="flex flex-col items-center gap-1 flex-1 min-w-0"
             >
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#E3F4FC] to-[#FDE8F0] flex items-center justify-center text-xl">
-                {c.icon}
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden ring-2 ring-[#F8C8DC]/50 shadow-sm">
+                <img src={c.image} alt={c.label} className="w-full h-full object-cover" />
               </div>
-              <span className="text-[10px] text-gray-600 text-center leading-tight">{c.label}</span>
+              <span className="text-[9px] sm:text-[10px] font-medium text-gray-600 text-center leading-tight truncate w-full">{c.label}</span>
             </button>
           ))}
         </div>

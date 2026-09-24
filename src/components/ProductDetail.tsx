@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { trackProductView, getRelatedProducts } from "@/lib/recommendations";
 import { getStock } from "@/lib/inventory";
+import { getAllReviews, PublicReview } from "@/lib/orders";
 import ProductCard from "./ProductCard";
 import PhotoUploader from "./PhotoUploader";
 
@@ -25,12 +26,23 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
   const [showShare, setShowShare] = useState(false);
   // Live stock from the manager inventory (undefined = not tracked = always available)
   const [liveStock, setLiveStock] = useState<number | undefined>(undefined);
+  // Reviews for this specific product
+  const [productReviews, setProductReviews] = useState<PublicReview[]>([]);
 
   useEffect(() => {
     getStock(productId)
       .then((s) => setLiveStock(s))
       .catch(() => setLiveStock(undefined));
+
+    getAllReviews()
+      .then((all) => setProductReviews(all.filter((r) => r.productId === productId)))
+      .catch(() => setProductReviews([]));
   }, [productId]);
+
+  const avgRating =
+    productReviews.length > 0
+      ? productReviews.reduce((s, r) => s + r.rating, 0) / productReviews.length
+      : 0;
 
   useEffect(() => {
     getProducts()
@@ -534,6 +546,61 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
       </div>
 
       {/* You may also like (Related Products) */}
+      {/* Product Reviews */}
+      <div className="mt-16">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-display text-2xl font-bold text-[#2C1810]">
+            Customer Reviews
+          </h2>
+          {productReviews.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-yellow-400 text-lg">
+                {"★".repeat(Math.round(avgRating))}
+                <span className="text-gray-300">{"★".repeat(5 - Math.round(avgRating))}</span>
+              </span>
+              <span className="text-sm font-semibold text-[#2C1810]">{avgRating.toFixed(1)}</span>
+              <span className="text-sm text-gray-400">({productReviews.length})</span>
+            </div>
+          )}
+        </div>
+
+        {productReviews.length === 0 ? (
+          <div className="glass-card rounded-2xl p-8 text-center">
+            <span className="text-4xl block mb-2">⭐</span>
+            <p className="text-gray-500 font-medium">No Reviews</p>
+            <p className="text-gray-400 text-sm mt-1">Be the first to review this product after your purchase.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {productReviews.map((r, idx) => (
+              <div key={r.orderId + idx} className="glass-card rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-semibold text-[#2C1810] text-sm">{r.customerName} <span className="text-[#5EAED4]">✓</span></p>
+                  <span className="text-yellow-400 text-sm">
+                    {"★".repeat(r.rating)}<span className="text-gray-300">{"★".repeat(5 - r.rating)}</span>
+                  </span>
+                </div>
+                {r.comment && <p className="text-gray-600 text-sm leading-relaxed mb-2">&quot;{r.comment}&quot;</p>}
+                {r.photos && r.photos.length > 0 && (
+                  <div className="flex gap-2 flex-wrap mb-2">
+                    {r.photos.slice(0, 4).map((p, i) => (
+                      <img key={i} src={p} alt="review" className="w-14 h-14 rounded-lg object-cover border border-gray-100" />
+                    ))}
+                  </div>
+                )}
+                {r.videos && r.videos.length > 0 && (
+                  <div className="flex gap-2 flex-wrap">
+                    {r.videos.slice(0, 2).map((v, i) => (
+                      <video key={i} src={v} controls className="w-24 h-16 rounded-lg object-cover bg-black" />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {relatedProducts.length > 0 && (
         <div className="mt-16">
           <h2 className="font-display text-2xl font-bold text-[#2C1810] mb-6 text-center">

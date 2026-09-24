@@ -20,15 +20,60 @@ export default function ProductManager() {
   const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
 
-  const handleImageFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      setForm((prev) => ({ ...prev, image: reader.result as string }));
-    };
-    reader.readAsDataURL(file);
-    e.target.value = "";
+  // Downscale + compress an image so many photos fit in the Firestore document.
+  const compressImage = (file: File, maxDim = 900, quality = 0.7): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > height && width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) { resolve(reader.result as string); return; }
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        };
+        img.onerror = reject;
+        img.src = reader.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  // Accepts MULTIPLE files and APPENDS them (so you can add photos one batch at a time)
+  const handleImageFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const selected = Array.from(files);
+    try {
+      const compressed = await Promise.all(
+        selected.map((f) => compressImage(f).catch(() => null))
+      );
+      const valid = compressed.filter((c): c is string => !!c);
+      setForm((prev) => {
+        const merged = [...prev.images, ...valid];
+        return { ...prev, images: merged, image: prev.image || merged[0] || "" };
+      });
+    } finally {
+      e.target.value = "";
+    }
+  };
+
+  const removeImage = (idx: number) => {
+    setForm((prev) => {
+      const next = prev.images.filter((_, i) => i !== idx);
+      return { ...prev, images: next, image: next[0] || "" };
+    });
   };
 
   const [form, setForm] = useState({
@@ -37,6 +82,7 @@ export default function ProductManager() {
     description: "",
     basePrice: 0,
     image: "",
+    images: [] as string[],
     customizable: true,
     pricePerExtra: 0,
     stock: 0,
@@ -63,6 +109,7 @@ export default function ProductManager() {
       description: "",
       basePrice: 0,
       image: "",
+      images: [],
       customizable: true,
       pricePerExtra: 0,
       stock: 0,
@@ -79,6 +126,7 @@ export default function ProductManager() {
       description: product.description,
       basePrice: product.basePrice,
       image: product.image,
+      images: product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []),
       customizable: product.customizable,
       pricePerExtra: product.pricePerExtra || 0,
       stock: product.stock ?? 0,
@@ -108,7 +156,8 @@ export default function ProductManager() {
       category: form.category,
       description: form.description,
       basePrice: Number(form.basePrice),
-      image: form.image || "/images/placeholder.jpg",
+      image: form.image || form.images[0] || "/images/placeholder.jpg",
+      images: form.images,
       customizable: form.customizable,
       stock: Math.max(0, Number(form.stock)),
       ...(form.pricePerExtra > 0 && { pricePerExtra: Number(form.pricePerExtra) }),
@@ -211,7 +260,7 @@ export default function ProductManager() {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Base Price (₹) *</label>
                 <input
@@ -234,42 +283,64 @@ export default function ProductManager() {
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8A0BF] focus:border-transparent outline-none text-gray-900 bg-white/80"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
-                <div className="flex items-center gap-3">
-                  {/* Preview */}
-                  {form.image && (
-                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-50 border border-gray-200 flex-shrink-0">
-                      <img src={form.image} alt="preview" className="w-full h-full object-cover" />
-                    </div>
-                  )}
-                  {/* Camera button */}
-                  <button
-                    type="button"
-                    onClick={() => cameraRef.current?.click()}
-                    className="flex flex-col items-center justify-center gap-1 w-20 h-16 rounded-xl border-2 border-dashed border-gray-300 hover:border-[#89C4E1] text-gray-500"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
-                    </svg>
-                    <span className="text-[10px]">Camera</span>
-                  </button>
-                  {/* Upload button */}
-                  <button
-                    type="button"
-                    onClick={() => galleryRef.current?.click()}
-                    className="flex flex-col items-center justify-center gap-1 w-20 h-16 rounded-xl border-2 border-dashed border-gray-300 hover:border-[#89C4E1] text-gray-500"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-                    </svg>
-                    <span className="text-[10px]">Upload</span>
-                  </button>
-                </div>
-                <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handleImageFile} className="hidden" />
-                <input ref={galleryRef} type="file" accept="image/*" onChange={handleImageFile} className="hidden" />
+            </div>
+
+            {/* Product Images (multiple) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Product Photos {form.images.length > 0 && <span className="text-gray-400">({form.images.length} added)</span>}
+              </label>
+              <div className="flex items-center gap-3 flex-wrap">
+                {/* Camera button */}
+                <button
+                  type="button"
+                  onClick={() => cameraRef.current?.click()}
+                  className="flex flex-col items-center justify-center gap-1 w-20 h-16 rounded-xl border-2 border-dashed border-gray-300 hover:border-[#89C4E1] text-gray-500"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                  </svg>
+                  <span className="text-[10px]">Camera</span>
+                </button>
+                {/* Upload button (multiple) */}
+                <button
+                  type="button"
+                  onClick={() => galleryRef.current?.click()}
+                  className="flex flex-col items-center justify-center gap-1 w-20 h-16 rounded-xl border-2 border-dashed border-gray-300 hover:border-[#89C4E1] text-gray-500"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                  </svg>
+                  <span className="text-[10px]">Upload</span>
+                </button>
               </div>
+
+              {/* Thumbnails */}
+              {form.images.length > 0 && (
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mt-3">
+                  {form.images.map((src, idx) => (
+                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group">
+                      <img src={src} alt={`Photo ${idx + 1}`} className="w-full h-full object-cover" />
+                      {idx === 0 && (
+                        <span className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[8px] text-center py-0.5">Main</span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeImage(idx)}
+                        className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center text-xs hover:bg-red-500"
+                        aria-label="Remove photo"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="text-xs text-gray-400 mt-2">Add as many photos as you like — the first one is the main image. Tap Upload to pick several at once.</p>
+
+              <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handleImageFile} className="hidden" />
+              <input ref={galleryRef} type="file" accept="image/*" multiple onChange={handleImageFile} className="hidden" />
             </div>
 
             <div>

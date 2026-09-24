@@ -24,6 +24,7 @@ export interface ProductDB {
   description: string;
   basePrice: number;
   image: string;
+  images?: string[];
   sizes?: ProductSize[];
   customizable: boolean;
   pricePerExtra?: number;

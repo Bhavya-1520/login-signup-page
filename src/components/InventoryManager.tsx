@@ -49,7 +49,8 @@ export default function InventoryManager() {
       }
       const stockState: Record<string, string> = {};
       merged.forEach((r) => {
-        stockState[r.id] = invMap[r.id] !== undefined ? String(invMap[r.id]) : "0";
+        // Leave the field empty when no stock has been set yet (no leading 0)
+        stockState[r.id] = invMap[r.id] !== undefined ? String(invMap[r.id]) : "";
       });
 
       setRows(merged);
@@ -105,7 +106,9 @@ export default function InventoryManager() {
 
       <div className="space-y-3">
         {rows.map((row) => {
-          const current = parseInt(stocks[row.id] || "0", 10) || 0;
+          const raw = stocks[row.id] ?? "";
+          const hasValue = raw !== "";
+          const current = parseInt(raw || "0", 10) || 0;
           return (
             <div key={row.id} className="glass-card rounded-2xl p-4 flex items-center gap-4">
               {/* Image */}
@@ -123,10 +126,10 @@ export default function InventoryManager() {
                 <h4 className="font-medium text-[#2C1810] truncate">{row.name}</h4>
                 <span
                   className={`text-xs font-medium ${
-                    current === 0 ? "text-red-500" : current <= 5 ? "text-amber-600" : "text-green-600"
+                    !hasValue ? "text-gray-400" : current === 0 ? "text-red-500" : current <= 5 ? "text-amber-600" : "text-green-600"
                   }`}
                 >
-                  {current === 0 ? "Out of stock" : `${current} in stock`}
+                  {!hasValue ? "Not set" : current === 0 ? "Out of stock" : `${current} in stock`}
                 </span>
               </div>
 

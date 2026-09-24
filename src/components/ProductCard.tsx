@@ -21,6 +21,7 @@ interface ProductCardProps {
   };
   onNavigate: (page: string) => void;
   outOfStock?: boolean;
+  rating?: { average: number; count: number };
 }
 
 const productEmojis: Record<string, string> = {
@@ -33,7 +34,7 @@ const productEmojis: Record<string, string> = {
   "raksha-bandhan-combo": "🎀",
 };
 
-export default function ProductCard({ product, onNavigate, outOfStock }: ProductCardProps) {
+export default function ProductCard({ product, onNavigate, outOfStock, rating }: ProductCardProps) {
   const { getItemByProductId, addItem, removeItem } = useCart();
   const { isWished, toggle } = useWishlist();
   const wished = isWished(product.id);
@@ -229,6 +230,18 @@ export default function ProductCard({ product, onNavigate, outOfStock }: Product
             ? "✓ In Cart — Remove"
             : "🛒 Add to Cart"}
         </button>
+
+        {/* Rating */}
+        {rating && rating.count > 0 && (
+          <div className="mt-2 flex items-center justify-center gap-1.5">
+            <span className="text-yellow-400 text-sm">
+              {"★".repeat(Math.round(rating.average))}
+              <span className="text-gray-300">{"★".repeat(5 - Math.round(rating.average))}</span>
+            </span>
+            <span className="text-xs font-semibold text-[#2C1810]">{rating.average.toFixed(1)}</span>
+            <span className="text-xs text-gray-400">({rating.count})</span>
+          </div>
+        )}
       </div>
     </div>
   );

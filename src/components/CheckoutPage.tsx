@@ -192,6 +192,7 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                 userEmail: user!.email || "",
                 userName: user!.displayName || formData.name,
                 items: items.map((i) => ({
+                  productId: i.productId,
                   name: i.name,
                   price: i.price,
                   quantity: i.quantity,

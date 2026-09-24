@@ -54,9 +54,16 @@ export default function ReviewsPage({ onNavigate }: ReviewsPageProps) {
                 <p className="text-gray-600 text-sm leading-relaxed mt-2 mb-3">&quot;{r.comment}&quot;</p>
               )}
               {r.photos && r.photos.length > 0 && (
-                <div className="flex gap-2 flex-wrap mb-3">
+                <div className="flex gap-2 flex-wrap mb-2">
                   {r.photos.slice(0, 4).map((p, i) => (
                     <img key={i} src={p} alt="review" className="w-14 h-14 rounded-lg object-cover border border-gray-100" />
+                  ))}
+                </div>
+              )}
+              {r.videos && r.videos.length > 0 && (
+                <div className="flex gap-2 flex-wrap mb-3">
+                  {r.videos.slice(0, 2).map((v, i) => (
+                    <video key={i} src={v} controls className="w-24 h-16 rounded-lg object-cover bg-black" />
                   ))}
                 </div>
               )}

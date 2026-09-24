@@ -52,25 +52,79 @@ export default function SearchBar({ onNavigate, compact }: SearchBarProps) {
     }
   };
 
-  const handleVoiceSearch = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Voice search is not supported on this browser. Try Chrome.");
+  const recognitionRef = useRef<any>(null);
+
+  const handleVoiceSearch = async () => {
+    // If already listening, stop.
+    if (listening && recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch {}
+      setListening(false);
       return;
     }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Voice search isn't supported on this browser. Please use Chrome, Edge, or Safari.");
+      return;
+    }
+
+    // Proactively request mic permission so we can show a clear message if blocked.
+    try {
+      if (navigator.mediaDevices?.getUserMedia) {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Release the mic immediately; SpeechRecognition opens its own.
+        stream.getTracks().forEach((t) => t.stop());
+      }
+    } catch {
+      alert("Microphone access is blocked. Please allow microphone permission in your browser settings and try again.");
+      return;
+    }
+
     const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
     recognition.lang = "en-IN";
-    setListening(true);
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognition.maxAlternatives = 3;
+
+    let finalText = "";
+
     recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      setListening(false);
-      setQuery(transcript);
-      // Navigate to full results for the spoken query
-      onNavigate(`search-${encodeURIComponent(transcript.trim())}`);
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const res = event.results[i];
+        if (res.isFinal) finalText += res[0].transcript;
+        else interim += res[0].transcript;
+      }
+      // Show live text in the box as the user speaks
+      setQuery((finalText || interim).trim());
+      setShowSuggestions(true);
     };
-    recognition.onerror = () => setListening(false);
-    recognition.onend = () => setListening(false);
-    recognition.start();
+
+    recognition.onerror = (e: any) => {
+      setListening(false);
+      if (e.error === "no-speech") {
+        alert("I didn't catch that. Please tap the mic and speak clearly.");
+      } else if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+        alert("Microphone access is blocked. Please allow it in your browser settings.");
+      }
+    };
+
+    recognition.onend = () => {
+      setListening(false);
+      const spoken = finalText.trim();
+      if (spoken) {
+        setQuery(spoken);
+        onNavigate(`search-${encodeURIComponent(spoken)}`);
+      }
+    };
+
+    setListening(true);
+    try {
+      recognition.start();
+    } catch {
+      setListening(false);
+    }
   };
 
   const handleImagePicked = (e: React.ChangeEvent<HTMLInputElement>) => {

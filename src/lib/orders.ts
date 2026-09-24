@@ -12,6 +12,7 @@ import {
 import { db } from "./firebase";
 
 export interface OrderItem {
+  productId?: string;
   name: string;
   price: number;
   quantity: number;
@@ -149,12 +150,14 @@ export async function requestReturnOrReplacement(
 // A customer review surfaced for public display (home page + reviews page)
 export interface PublicReview {
   orderId: string;
+  productId?: string;
   customerName: string;
   productName: string;
   productImage?: string;
   rating: number;
   comment: string;
   photos: string[];
+  videos: string[];
   createdAt: Timestamp | Date | null;
 }
 
@@ -171,12 +174,14 @@ export async function getAllReviews(): Promise<PublicReview[]> {
       const firstItem = order.items?.[0];
       reviews.push({
         orderId: d.id,
+        productId: firstItem?.productId,
         customerName: order.userName || order.deliveryDetails?.name || "Customer",
         productName: firstItem?.name || "Handcrafted gift",
         productImage: firstItem?.image,
         rating: order.review.rating,
         comment: order.review.comment || "",
         photos: order.review.photos || [],
+        videos: order.review.videos || [],
         createdAt: order.review.createdAt || null,
       });
     }
@@ -188,4 +193,26 @@ export async function getAllReviews(): Promise<PublicReview[]> {
     const dateB = (b.createdAt as any)?.toDate?.() || new Date(b.createdAt as any || 0);
     return dateB.getTime() - dateA.getTime();
   });
+}
+
+// Rating summary per product: { [productId]: { average, count } }
+export interface RatingSummary {
+  average: number;
+  count: number;
+}
+
+export async function getProductRatings(): Promise<Record<string, RatingSummary>> {
+  const reviews = await getAllReviews();
+  const buckets: Record<string, number[]> = {};
+  reviews.forEach((r) => {
+    if (r.productId) {
+      (buckets[r.productId] = buckets[r.productId] || []).push(r.rating);
+    }
+  });
+  const result: Record<string, RatingSummary> = {};
+  Object.entries(buckets).forEach(([pid, ratings]) => {
+    const sum = ratings.reduce((a, b) => a + b, 0);
+    result[pid] = { average: sum / ratings.length, count: ratings.length };
+  });
+  return result;
 }
