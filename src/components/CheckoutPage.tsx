@@ -239,9 +239,9 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                 }),
               });
             } catch {}
-            // Reduce manager inventory for the ordered products
+            // Reduce manager inventory for the ordered products (per size when applicable)
             try {
-              await decrementStock(items.map((i) => ({ productId: i.productId, quantity: i.quantity })));
+              await decrementStock(items.map((i) => ({ productId: i.productId, quantity: i.quantity, size: i.size })));
             } catch {}
             setPlacedAmount(grandTotal);
             setOrderPlaced(true);
@@ -344,9 +344,9 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
         }),
       });
     } catch {}
-    // Reduce manager inventory for the ordered products
+    // Reduce manager inventory for the ordered products (per size when applicable)
     try {
-      await decrementStock(items.map((i) => ({ productId: i.productId, quantity: i.quantity })));
+      await decrementStock(items.map((i) => ({ productId: i.productId, quantity: i.quantity, size: i.size })));
     } catch {}
     setPlacedAmount(grandTotal);
     setOrderPlaced(true);

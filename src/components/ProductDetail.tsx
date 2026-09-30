@@ -7,7 +7,7 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { trackProductView, getRelatedProducts } from "@/lib/recommendations";
-import { getStock } from "@/lib/inventory";
+import { getInventory, stockFromEntry, InventoryEntry } from "@/lib/inventory";
 import { getAllReviews, PublicReview } from "@/lib/orders";
 import ProductCard from "./ProductCard";
 import PhotoUploader from "./PhotoUploader";
@@ -24,15 +24,15 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
   const { user } = useAuth();
   const { isWished, toggle } = useWishlist();
   const [showShare, setShowShare] = useState(false);
-  // Live stock from the manager inventory (undefined = not tracked = always available)
-  const [liveStock, setLiveStock] = useState<number | undefined>(undefined);
+  // Live inventory entry (per-product or per-size) from the manager inventory
+  const [invEntry, setInvEntry] = useState<InventoryEntry | undefined>(undefined);
   // Reviews for this specific product
   const [productReviews, setProductReviews] = useState<PublicReview[]>([]);
 
   useEffect(() => {
-    getStock(productId)
-      .then((s) => setLiveStock(s))
-      .catch(() => setLiveStock(undefined));
+    getInventory(productId)
+      .then((e) => setInvEntry(e))
+      .catch(() => setInvEntry(undefined));
 
     getAllReviews()
       .then((all) => setProductReviews(all.filter((r) => r.productId === productId)))
@@ -111,15 +111,11 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
   const MAX_FLOWERS = 50;
 
   // Inventory + per-order limit. Max 10 per order, and never more than stock.
-  // Live inventory (from the manager Inventory tab) takes priority; fall back to
-  // any stock stored on the product; otherwise treat as not tracked.
+  // Stock is resolved for the CURRENTLY SELECTED size when the product has sizes.
   const PER_ORDER_LIMIT = 10;
   const stock =
-    typeof liveStock === "number"
-      ? liveStock
-      : typeof product.stock === "number"
-      ? product.stock
-      : undefined;
+    stockFromEntry(invEntry, selectedSize) ??
+    (typeof product.stock === "number" ? product.stock : undefined);
   const isOutOfStock = stock === 0;
   const maxQty = stock === undefined ? PER_ORDER_LIMIT : Math.min(PER_ORDER_LIMIT, stock);
 

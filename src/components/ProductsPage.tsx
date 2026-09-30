@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { products as fallbackProducts } from "@/lib/products";
 import { getProducts, categoryToGroup } from "@/lib/productsDB";
-import { getInventoryMap, InventoryMap } from "@/lib/inventory";
+import { getInventoryMap, isEntryOutOfStock, InventoryMap } from "@/lib/inventory";
 import { getProductRatings, RatingSummary } from "@/lib/orders";
 import ProductCard from "./ProductCard";
 
@@ -110,7 +110,7 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
               <ProductCard
                 product={product}
                 onNavigate={onNavigate}
-                outOfStock={inventory[product.id] === 0}
+                outOfStock={isEntryOutOfStock(inventory[product.id])}
                 rating={ratings[product.id]}
               />
             </div>
