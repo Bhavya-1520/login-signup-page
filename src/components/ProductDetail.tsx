@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { products as fallbackProducts } from "@/lib/products";
 import { getProducts } from "@/lib/productsDB";
 import { useCart } from "@/context/CartContext";
@@ -43,6 +43,24 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
     productReviews.length > 0
       ? productReviews.reduce((s, r) => s + r.rating, 0) / productReviews.length
       : 0;
+
+  // Touch swipe for the main image gallery
+  const imgTouchStartX = useRef<number | null>(null);
+  const onGalleryTouchStart = (e: React.TouchEvent) => {
+    imgTouchStartX.current = e.touches[0].clientX;
+  };
+  const onGalleryTouchEnd = (e: React.TouchEvent) => {
+    const imgs = product?.images;
+    if (imgTouchStartX.current === null || !imgs || imgs.length <= 1) { imgTouchStartX.current = null; return; }
+    const diff = e.changedTouches[0].clientX - imgTouchStartX.current;
+    const threshold = 40;
+    if (diff <= -threshold) {
+      setCurrentImage((c) => (c + 1) % imgs.length);
+    } else if (diff >= threshold) {
+      setCurrentImage((c) => (c - 1 + imgs.length) % imgs.length);
+    }
+    imgTouchStartX.current = null;
+  };
 
   useEffect(() => {
     getProducts()
@@ -143,6 +161,7 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
       maxPhotos: product.maxPhotos || 5,
       customPhotos: product.requiresPhotos ? customPhotos : undefined,
       maxQuantity: maxQty,
+      weightGrams: product.weightGrams || 500,
     });
   };
 
@@ -246,12 +265,17 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-2">
         {/* Product Image Gallery */}
         <div className="relative">
-          <div className="aspect-square bg-white rounded-3xl flex items-center justify-center relative overflow-hidden glass-card">
+          <div
+            className="aspect-square bg-white rounded-3xl flex items-center justify-center relative overflow-hidden glass-card"
+            onTouchStart={onGalleryTouchStart}
+            onTouchEnd={onGalleryTouchEnd}
+          >
             {product.image && !product.image.includes("placeholder") ? (
               <img
                 src={product.images ? product.images[currentImage] : product.image}
                 alt={product.name}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain select-none"
+                draggable={false}
               />
             ) : (
               <>

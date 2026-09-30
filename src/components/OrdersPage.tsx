@@ -275,6 +275,26 @@ export default function OrdersPage({ onNavigate }: OrdersPageProps) {
                     </div>
                   )}
 
+                  {/* Courier tracking */}
+                  {order.trackingId && ["shipped", "delivered"].includes(order.status) && (
+                    <div className="mb-4 flex items-center gap-3 p-3 rounded-2xl bg-purple-50 border border-purple-100">
+                      <span className="text-xl">🚚</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500">{order.courier || "DTDC"} Tracking No.</p>
+                        <p className="text-sm font-semibold text-[#2C1810] truncate">{order.trackingId}</p>
+                      </div>
+                      <a
+                        href={`https://www.dtdc.in/tracking/tracking_results.asp?strCnno=${encodeURIComponent(order.trackingId)}&TrkType=CONSIGNMENT`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="px-4 py-2 rounded-full bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white text-xs font-medium flex-shrink-0"
+                      >
+                        Track →
+                      </a>
+                    </div>
+                  )}
+
                   {/* Items */}
                   <div className="space-y-3 pt-2">
                     {order.items.map((item, index) => (

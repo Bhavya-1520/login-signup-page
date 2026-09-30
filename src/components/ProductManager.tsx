@@ -86,6 +86,7 @@ export default function ProductManager() {
     customizable: true,
     pricePerExtra: 0,
     stock: 0,
+    weightGrams: 500,
   });
 
   useEffect(() => {
@@ -113,6 +114,7 @@ export default function ProductManager() {
       customizable: true,
       pricePerExtra: 0,
       stock: 0,
+      weightGrams: 500,
     });
     setEditingProduct(null);
     setShowForm(false);
@@ -130,6 +132,7 @@ export default function ProductManager() {
       customizable: product.customizable,
       pricePerExtra: product.pricePerExtra || 0,
       stock: product.stock ?? 0,
+      weightGrams: product.weightGrams ?? 500,
     });
     setShowForm(true);
   };
@@ -160,6 +163,7 @@ export default function ProductManager() {
       images: form.images,
       customizable: form.customizable,
       stock: Math.max(0, Number(form.stock)),
+      weightGrams: Math.max(1, Number(form.weightGrams) || 500),
       ...(form.pricePerExtra > 0 && { pricePerExtra: Number(form.pricePerExtra) }),
     };
 
@@ -343,19 +347,35 @@ export default function ProductManager() {
               <input ref={galleryRef} type="file" accept="image/*" multiple onChange={handleImageFile} className="hidden" />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Inventory / Stock (units available) *</label>
-              <input
-                type="number"
-                min={0}
-                value={form.stock}
-                onChange={(e) => setForm({ ...form, stock: Math.max(0, Number(e.target.value)) })}
-                placeholder="e.g., 5"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8A0BF] focus:border-transparent outline-none text-gray-900 bg-white/80"
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                Customers cannot order more than this. Set to 0 to mark as out of stock.
-              </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Inventory / Stock (units available) *</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={form.stock}
+                  onChange={(e) => setForm({ ...form, stock: Math.max(0, Number(e.target.value)) })}
+                  placeholder="e.g., 5"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8A0BF] focus:border-transparent outline-none text-gray-900 bg-white/80"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Customers cannot order more than this. Set to 0 to mark as out of stock.
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Weight (grams) — for shipping *</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={form.weightGrams}
+                  onChange={(e) => setForm({ ...form, weightGrams: Math.max(1, Number(e.target.value)) })}
+                  placeholder="e.g., 500"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E8A0BF] focus:border-transparent outline-none text-gray-900 bg-white/80"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Used to calculate DTDC shipping. Default 500g if unsure.
+                </p>
+              </div>
             </div>
 
             <div className="flex items-center gap-3">

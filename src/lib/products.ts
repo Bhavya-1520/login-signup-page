@@ -16,6 +16,8 @@ export interface Product {
   maxPhotos?: number;
   // Manager inventory: how many units are available. undefined = not tracked (treated as in stock).
   stock?: number;
+  // Shipping weight per unit, in grams (used for DTDC charge calculation).
+  weightGrams?: number;
 }
 
 export const products: Product[] = [

@@ -108,8 +108,11 @@ function getEmailContent(type: EmailType, data: any) {
             <div style="background: #f0fdf4; border-radius: 8px; padding: 16px; margin: 20px 0;">
               <p style="margin: 4px 0; font-size: 14px; color: #333;"><strong>Order ID:</strong> #${data.orderId?.slice(-8).toUpperCase()}</p>
               <p style="margin: 4px 0; font-size: 14px; color: #333;"><strong>Status:</strong> Shipped & In Transit</p>
-              <p style="margin: 4px 0; font-size: 14px; color: #333;"><strong>Delivery to:</strong> ${data.city} - ${data.pincode}</p>
+              ${data.trackingId ? `<p style="margin: 4px 0; font-size: 14px; color: #333;"><strong>Courier:</strong> ${data.courier || "DTDC"}</p>
+              <p style="margin: 4px 0; font-size: 14px; color: #333;"><strong>Tracking No. (AWB):</strong> ${data.trackingId}</p>` : ""}
+              ${data.city ? `<p style="margin: 4px 0; font-size: 14px; color: #333;"><strong>Delivery to:</strong> ${data.city} - ${data.pincode}</p>` : ""}
             </div>
+            ${data.trackingId ? `<a href="https://www.dtdc.in/tracking/tracking_results.asp?strCnno=${encodeURIComponent(data.trackingId)}&TrkType=CONSIGNMENT" style="display:inline-block; background: linear-gradient(to right, #89C4E1, #F8C8DC); color: white; text-decoration: none; padding: 10px 24px; border-radius: 999px; font-size: 14px; font-weight: 600; margin-bottom: 8px;">Track your order →</a>` : ""}
             <p style="color: #888; font-size: 13px;">Your package will arrive soon!</p>
           </div>
           ${footer}`,

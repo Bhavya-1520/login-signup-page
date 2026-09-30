@@ -17,6 +17,8 @@ export interface CartItem {
   customPhotos?: string[];
   // Max units allowed for this line (min of per-order limit and stock)
   maxQuantity?: number;
+  // Shipping weight per unit in grams
+  weightGrams?: number;
 }
 
 interface CartContextType {

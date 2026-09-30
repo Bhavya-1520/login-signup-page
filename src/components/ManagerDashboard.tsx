@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { isAdmin } from "@/lib/admin";
-import { getAllOrders, updateOrderStatus, Order } from "@/lib/orders";
+import { getAllOrders, updateOrderStatus, setTracking, Order } from "@/lib/orders";
 import ProductManager from "./ProductManager";
 import InventoryManager from "./InventoryManager";
 
@@ -37,6 +37,44 @@ export default function ManagerDashboard({ onNavigate }: ManagerDashboardProps) 
   const [orderView, setOrderView] = useState<OrderView>("overview");
   const [filter, setFilter] = useState<string>("all");
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+
+  // AWB tracking input
+  const [awbInput, setAwbInput] = useState("");
+  const [savingAwb, setSavingAwb] = useState(false);
+
+  const handleSaveTracking = async (orderId: string) => {
+    const awb = awbInput.trim();
+    if (!awb) { alert("Please enter the DTDC AWB / tracking number."); return; }
+    setSavingAwb(true);
+    try {
+      await setTracking(orderId, "DTDC", awb);
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, courier: "DTDC", trackingId: awb } : o)));
+
+      // Notify the customer their order shipped, with the tracking number
+      const order = orders.find((o) => o.id === orderId);
+      if (order?.userEmail) {
+        fetch("/api/email/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "order-shipped",
+            to: order.userEmail,
+            data: {
+              orderId,
+              customerName: order.deliveryDetails.name,
+              items: order.items,
+              totalAmount: order.totalAmount,
+              courier: "DTDC",
+              trackingId: awb,
+            },
+          }),
+        }).catch(() => {});
+      }
+    } catch {
+      alert("Failed to save tracking number. Please try again.");
+    }
+    setSavingAwb(false);
+  };
 
   useEffect(() => {
     if (user && isAdmin(user.email)) {
@@ -139,7 +177,13 @@ export default function ManagerDashboard({ onNavigate }: ManagerDashboardProps) 
   };
 
   const openStatus = (key: string) => { setFilter(key); setOrderView("list"); };
-  const openOrder = (id?: string) => { if (!id) return; setSelectedOrderId(id); setOrderView("detail"); };
+  const openOrder = (id?: string) => {
+    if (!id) return;
+    const o = orders.find((ord) => ord.id === id);
+    setAwbInput(o?.trackingId || "");
+    setSelectedOrderId(id);
+    setOrderView("detail");
+  };
 
   // ---------------- ORDERS: OVERVIEW ----------------
   const renderOverview = () => (
@@ -345,6 +389,42 @@ export default function ManagerDashboard({ onNavigate }: ManagerDashboardProps) 
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Courier tracking */}
+        <div className="glass-card rounded-3xl p-6 mb-5">
+          <h3 className="font-semibold text-[#2C1810] mb-1">🚚 DTDC Courier Tracking</h3>
+          <p className="text-xs text-gray-400 mb-3">Enter the AWB number after handing the parcel to DTDC. The customer gets a tracking link and a shipped email.</p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              type="text"
+              value={awbInput}
+              onChange={(e) => setAwbInput(e.target.value.replace(/\s/g, ""))}
+              placeholder="DTDC AWB number (e.g. D12345678)"
+              className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#89C4E1] focus:border-transparent outline-none text-gray-900 bg-white/80"
+            />
+            <button
+              onClick={() => order.id && handleSaveTracking(order.id)}
+              disabled={savingAwb}
+              className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#89C4E1] to-[#F8C8DC] text-white text-sm font-medium disabled:opacity-50"
+            >
+              {savingAwb ? "Saving..." : order.trackingId ? "Update AWB" : "Save AWB"}
+            </button>
+          </div>
+          {order.trackingId && (
+            <div className="mt-3 flex items-center gap-3 text-sm">
+              <span className="text-gray-500">Current AWB:</span>
+              <span className="font-medium text-[#2C1810]">{order.trackingId}</span>
+              <a
+                href={`https://www.dtdc.in/tracking/tracking_results.asp?strCnno=${encodeURIComponent(order.trackingId)}&TrkType=CONSIGNMENT`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#5EAED4] font-medium hover:underline ml-auto"
+              >
+                Track on DTDC →
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Update status */}

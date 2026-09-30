@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { products as fallbackProducts } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -69,6 +69,7 @@ export default function ProductCard({ product, onNavigate, outOfStock, rating }:
         colors: "",
         customNote: "",
         image: product.image,
+        weightGrams: (product as any).weightGrams || 500,
       });
     }
   };
@@ -105,13 +106,49 @@ export default function ProductCard({ product, onNavigate, outOfStock, rating }:
     setCurrentImg((currentImg - 1 + images.length) % images.length);
   };
 
+  // Touch swipe for multiple images
+  const touchStartX = useRef<number | null>(null);
+  const swiped = useRef(false);
+
+  const onImgTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    swiped.current = false;
+  };
+  const onImgTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current !== null && Math.abs(e.touches[0].clientX - touchStartX.current) > 10) {
+      swiped.current = true;
+    }
+  };
+  const onImgTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || images.length <= 1) { touchStartX.current = null; return; }
+    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    const threshold = 40;
+    if (diff <= -threshold) {
+      setCurrentImg((c) => (c + 1) % images.length); // swipe left → next photo
+    } else if (diff >= threshold) {
+      setCurrentImg((c) => (c - 1 + images.length) % images.length); // swipe right → prev photo
+    }
+    touchStartX.current = null;
+  };
+
+  const handleCardClick = () => {
+    // Don't open the product if the user was swiping through photos
+    if (swiped.current) { swiped.current = false; return; }
+    onNavigate(`product-${product.id}`);
+  };
+
   return (
     <div
-      onClick={() => onNavigate(`product-${product.id}`)}
+      onClick={handleCardClick}
       className="group cursor-pointer glass-card rounded-3xl overflow-hidden hover:shadow-xl hover:shadow-sky-100/40 transition-all duration-500 hover:-translate-y-2"
     >
       {/* Image */}
-      <div className="aspect-[4/3] bg-white flex items-center justify-center relative overflow-hidden">
+      <div
+        className="aspect-[4/3] bg-white flex items-center justify-center relative overflow-hidden"
+        onTouchStart={onImgTouchStart}
+        onTouchMove={onImgTouchMove}
+        onTouchEnd={onImgTouchEnd}
+      >
         {hasImage ? (
           <img
             src={images[currentImg]}

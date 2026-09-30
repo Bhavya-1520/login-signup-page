@@ -30,6 +30,8 @@ export interface ProductDB {
   pricePerExtra?: number;
   // Manager inventory: units available. undefined = not tracked.
   stock?: number;
+  // Shipping weight per unit, in grams.
+  weightGrams?: number;
 }
 
 export const CATEGORIES = [

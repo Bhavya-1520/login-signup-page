@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface HeroCarouselProps {
   onNavigate: (page: string) => void;
@@ -41,6 +41,8 @@ const slides = [
 
 export default function HeroCarousel({ onNavigate }: HeroCarouselProps) {
   const [current, setCurrent] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+  const touchMoved = useRef(false);
 
   // Auto-slide every 4 seconds
   useEffect(() => {
@@ -54,6 +56,30 @@ export default function HeroCarousel({ onNavigate }: HeroCarouselProps) {
   const prev = () => setCurrent((current - 1 + slides.length) % slides.length);
   const next = () => setCurrent((current + 1) % slides.length);
 
+  // Touch swipe handlers
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchMoved.current = false;
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current !== null && Math.abs(e.touches[0].clientX - touchStartX.current) > 10) {
+      touchMoved.current = true;
+    }
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    const threshold = 40;
+    if (diff <= -threshold) {
+      // swiped left → show next (right-side) photo
+      setCurrent((c) => (c + 1) % slides.length);
+    } else if (diff >= threshold) {
+      // swiped right → show previous (left-side) photo
+      setCurrent((c) => (c - 1 + slides.length) % slides.length);
+    }
+    touchStartX.current = null;
+  };
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-[#F0F9FF] via-white to-[#FDF2F8]">
       {/* Slides */}
@@ -65,15 +91,21 @@ export default function HeroCarousel({ onNavigate }: HeroCarouselProps) {
           }`}
         >
           <div
-            onClick={() => onNavigate(slide.link)}
+            onClick={() => { if (!touchMoved.current) onNavigate(slide.link); }}
             className="relative w-full cursor-pointer"
           >
             {/* Image with dots inside at bottom */}
-            <div className="relative w-full h-[38vh] sm:h-[55vh] lg:h-[65vh] bg-gradient-to-br from-[#F0F9FF] to-[#FDF2F8]">
+            <div
+              className="relative w-full h-[38vh] sm:h-[55vh] lg:h-[65vh] bg-gradient-to-br from-[#F0F9FF] to-[#FDF2F8]"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
               <img
                 src={slide.image}
                 alt={slide.price}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain select-none"
+                draggable={false}
               />
               {/* Dots inside image */}
               <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">

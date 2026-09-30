@@ -53,6 +53,10 @@ export interface Order {
   };
   review?: OrderReview;
   returnReason?: string;
+  // Shipping
+  shippingCharge?: number;
+  courier?: string; // e.g. "DTDC"
+  trackingId?: string; // AWB number
   createdAt: Timestamp | Date;
 }
 
@@ -112,6 +116,17 @@ export async function updateOrderStatus(
 
   const orderRef = doc(db, "orders", orderId);
   await updateDoc(orderRef, { status });
+}
+
+// Save courier + AWB tracking number for an order
+export async function setTracking(
+  orderId: string,
+  courier: string,
+  trackingId: string
+): Promise<void> {
+  if (!db) throw new Error("Firebase not initialized");
+  const orderRef = doc(db, "orders", orderId);
+  await updateDoc(orderRef, { courier, trackingId });
 }
 
 // Cancel an order (only allowed before shipping)

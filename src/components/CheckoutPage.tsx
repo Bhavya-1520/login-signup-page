@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { saveOrder } from "@/lib/orders";
 import { getUserAddresses, addAddress, Address } from "@/lib/addresses";
 import { decrementStock } from "@/lib/inventory";
+import { getShipping, ShippingSpeed } from "@/lib/shipping";
 import PhotoUploader from "./PhotoUploader";
 
 interface CheckoutPageProps {
@@ -18,6 +19,7 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
   const { items, totalPrice, clearCart, setItemPhotos } = useCart();
   const { user, loading: authLoading } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("online");
+  const [shippingSpeed, setShippingSpeed] = useState<ShippingSpeed>("normal");
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -138,7 +140,7 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: totalPrice,
+          amount: grandTotal,
           receipt: `order_${Date.now()}`,
           notes: {
             customer_name: formData.name,
@@ -202,7 +204,9 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                   image: i.image,
                   customPhotos: i.customPhotos || [],
                 })),
-                totalAmount: totalPrice,
+                totalAmount: grandTotal,
+                shippingCharge: shippingCharge,
+                courier: "DTDC",
                 paymentMethod: "online",
                 paymentId: response.razorpay_payment_id,
                 razorpayOrderId: response.razorpay_order_id,
@@ -225,7 +229,8 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                     orderId: Date.now().toString(),
                     customerName: formData.name,
                     items: items.map((i) => ({ name: i.name, price: i.price, quantity: i.quantity })),
-                    totalAmount: totalPrice,
+                    totalAmount: grandTotal,
+                    shippingCharge,
                     paymentMethod: "online",
                     address: formData.address,
                     city: formData.city,
@@ -238,7 +243,7 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
             try {
               await decrementStock(items.map((i) => ({ productId: i.productId, quantity: i.quantity })));
             } catch {}
-            setPlacedAmount(totalPrice);
+            setPlacedAmount(grandTotal);
             setOrderPlaced(true);
             setLoading(false);
             clearCart();
@@ -306,7 +311,9 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
           customNote: i.customNote,
           image: i.image,
         })),
-        totalAmount: totalPrice,
+        totalAmount: grandTotal,
+        shippingCharge: shippingCharge,
+        courier: "DTDC",
         paymentMethod: "cod",
         status: "placed",
         deliveryDetails: formData,
@@ -327,7 +334,8 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
             orderId: Date.now().toString(),
             customerName: formData.name,
             items: items.map((i) => ({ name: i.name, price: i.price, quantity: i.quantity })),
-            totalAmount: totalPrice,
+            totalAmount: grandTotal,
+            shippingCharge,
             paymentMethod: "cod",
             address: formData.address,
             city: formData.city,
@@ -340,7 +348,7 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
     try {
       await decrementStock(items.map((i) => ({ productId: i.productId, quantity: i.quantity })));
     } catch {}
-    setPlacedAmount(totalPrice);
+    setPlacedAmount(grandTotal);
     setOrderPlaced(true);
     clearCart();
     setLoading(false);
@@ -350,6 +358,17 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
   const missingPhotoItems = items.filter(
     (i) => i.requiresPhotos && (!i.customPhotos || i.customPhotos.length === 0)
   );
+
+  // Total shipping weight (sum of item weights × quantity)
+  const totalWeightGrams = items.reduce(
+    (sum, i) => sum + (i.weightGrams || 500) * i.quantity,
+    0
+  );
+
+  // Shipping = f(pincode zone, weight, speed). Total = subtotal + shipping.
+  const shippingInfo = getShipping(formData.pincode, totalWeightGrams, shippingSpeed);
+  const shippingCharge = shippingInfo.charge;
+  const grandTotal = totalPrice + shippingCharge;
 
   const handlePlaceOrder = (e: React.FormEvent) => {
     e.preventDefault();
@@ -708,6 +727,40 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
               </div>
             )}
 
+            {/* Delivery Speed */}
+            <div className="glass-card rounded-3xl p-6 sm:p-8">
+              <h2 className="font-display text-xl font-semibold text-[#2C1810] mb-2">
+                🚚 Delivery Option
+              </h2>
+              {formData.pincode && (
+                <p className="text-xs text-gray-400 mb-4">Zone: {shippingInfo.zoneLabel}</p>
+              )}
+              <div className="grid grid-cols-2 gap-3">
+                {(["normal", "express"] as const).map((sp) => {
+                  const info = getShipping(formData.pincode, totalWeightGrams, sp);
+                  const selected = shippingSpeed === sp;
+                  return (
+                    <button
+                      key={sp}
+                      type="button"
+                      onClick={() => setShippingSpeed(sp)}
+                      className={`p-4 rounded-2xl border-2 text-left transition-all ${
+                        selected ? "border-[#89C4E1] bg-sky-50" : "border-gray-200 hover:border-sky-200"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 font-semibold text-[#2C1810]">
+                        {sp === "normal" ? "🚚 Normal" : "⚡ Express"}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{sp === "normal" ? "Delivery in 3–4 days" : "Delivery in under 2 days"}</p>
+                      <p className="text-sm font-bold text-[#5EAED4] mt-1">
+                        {formData.pincode ? `₹${info.charge}` : "Enter pincode"}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Payment Method */}
             <div className="glass-card rounded-3xl p-6 sm:p-8">
               <h2 className="font-display text-xl font-semibold text-[#2C1810] mb-5">
@@ -803,12 +856,16 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                   <span>₹{totalPrice}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-500 mb-2">
-                  <span>Delivery</span>
-                  <span className="text-green-600 font-medium">Free</span>
+                  <span>Delivery {formData.pincode && <span className="text-gray-400">({shippingSpeed === "express" ? "Express" : "Normal"}, {shippingInfo.zoneLabel})</span>}</span>
+                  {!formData.pincode ? (
+                    <span className="text-gray-400">Enter pincode</span>
+                  ) : (
+                    <span>₹{shippingCharge}</span>
+                  )}
                 </div>
                 <div className="flex justify-between mt-3 pt-3 border-t border-gray-200">
                   <span className="font-bold text-[#2C1810] text-lg">Total</span>
-                  <span className="font-bold text-2xl text-[#5EAED4] font-display">₹{totalPrice}</span>
+                  <span className="font-bold text-2xl text-[#5EAED4] font-display">₹{grandTotal}</span>
                 </div>
               </div>
 
@@ -822,8 +879,8 @@ export default function CheckoutPage({ onNavigate }: CheckoutPageProps) {
                   : missingPhotoItems.length > 0
                   ? "📸 Upload photos to continue"
                   : paymentMethod === "online"
-                  ? `Pay ₹${totalPrice}`
-                  : `Place Order (COD) — ₹${totalPrice}`
+                  ? `Pay ₹${grandTotal}`
+                  : `Place Order (COD) — ₹${grandTotal}`
                 }
               </button>
               {missingPhotoItems.length > 0 && (
