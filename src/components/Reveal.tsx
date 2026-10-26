@@ -4,12 +4,9 @@ import { useEffect, useRef, useState, ReactNode } from "react";
 
 interface RevealProps {
   children: ReactNode;
-  /** direction of entrance */
   variant?: "up" | "left" | "right" | "scale";
-  /** delay in ms (for staggering a row of items) */
   delay?: number;
   className?: string;
-  /** render as a different tag if needed */
   as?: keyof JSX.IntrinsicElements;
 }
 
@@ -20,29 +17,45 @@ export default function Reveal({
   className = "",
   as = "div",
 }: RevealProps) {
-  const ref = useRef<HTMLElement | null>(null);
+  const [node, setNode] = useState<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
+  const shown = useRef(false);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    if (!node) return;
 
-    // If already in view on mount (e.g. above the fold), reveal immediately.
+    // Fallback: if IntersectionObserver isn't available, just show it.
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && !shown.current) {
+            shown.current = true;
             setVisible(true);
             observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0.1, rootMargin: "0px 0px -10% 0px" }
     );
 
-    observer.observe(el);
+    observer.observe(node);
+
+    // Safety: if it's already in view at mount, reveal on next frame.
+    const rect = node.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0 && !shown.current) {
+      requestAnimationFrame(() => {
+        shown.current = true;
+        setVisible(true);
+      });
+    }
+
     return () => observer.disconnect();
-  }, []);
+  }, [node]);
 
   const variantClass =
     variant === "left"
@@ -57,9 +70,9 @@ export default function Reveal({
 
   return (
     <Tag
-      ref={ref}
+      ref={setNode}
       className={`${variantClass} ${visible ? "reveal-visible" : ""} ${className}`}
-      style={{ transitionDelay: visible ? `${delay}ms` : "0ms" }}
+      style={{ transitionDelay: `${delay}ms` }}
     >
       {children}
     </Tag>

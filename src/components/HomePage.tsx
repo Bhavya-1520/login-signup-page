@@ -52,9 +52,9 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
       {/* Scrolling marquee strip */}
       <div className="marquee py-3 sm:py-3.5">
-        <div className="marquee-track">
+        <div className="marquee-track text-sm sm:text-lg">
           {[0, 1].map((dup) => (
-            <div key={dup} className="marquee-item text-sm sm:text-lg">
+            <div key={dup} className="marquee-group" aria-hidden={dup === 1}>
               {[
                 "Handcrafts",
                 "Bouquets",
@@ -65,7 +65,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 "Made with Love",
                 "Order now from House of Gnapakam",
               ].map((word, i) => (
-                <span key={i} className="marquee-item">
+                <span key={i} className="marquee-word">
                   <span className="marquee-star">✦</span>
                   <span>{word}</span>
                 </span>

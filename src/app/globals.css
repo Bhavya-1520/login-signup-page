@@ -172,23 +172,20 @@ html {
 /* Elements start hidden + shifted, then animate in when revealed */
 .reveal {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(48px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
 .reveal.reveal-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) translateX(0) scale(1);
 }
 
 /* Directional variants */
-.reveal-left { transform: translateX(-32px); }
-.reveal-left.reveal-visible { transform: translateX(0); }
-.reveal-right { transform: translateX(32px); }
-.reveal-right.reveal-visible { transform: translateX(0); }
-.reveal-scale { transform: scale(0.94); }
-.reveal-scale.reveal-visible { transform: scale(1); }
+.reveal-left { transform: translateX(-56px); }
+.reveal-right { transform: translateX(56px); }
+.reveal-scale { transform: scale(0.9); }
 
 /* Respect users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
@@ -240,23 +237,29 @@ html {
 /* ---------------- Scrolling marquee strip ---------------- */
 .marquee {
   overflow: hidden;
-  white-space: nowrap;
   background: linear-gradient(90deg, #5EAED4 0%, #89C4E1 25%, #E8A0BF 55%, #C77DA5 100%);
   box-shadow: inset 0 1px 6px rgba(0,0,0,0.08);
 }
+/* Track holds two identical groups side by side; moving -50% loops seamlessly */
 .marquee-track {
-  display: inline-flex;
-  align-items: center;
-  animation: marqueeScroll 22s linear infinite;
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 25s linear infinite;
 }
 .marquee:hover .marquee-track {
   animation-play-state: paused;
 }
-.marquee-item {
+.marquee-group {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+.marquee-word {
   display: inline-flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   padding: 0 1.25rem;
+  white-space: nowrap;
   color: #ffffff;
   font-family: 'Playfair Display', serif;
   font-weight: 600;
@@ -265,8 +268,8 @@ html {
 }
 .marquee-star { color: #FFE9A8; }
 @keyframes marqueeScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { animation: none; }
