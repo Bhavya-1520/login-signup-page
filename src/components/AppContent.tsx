@@ -220,6 +220,40 @@ function GatedApp() {
   // Show back button on all pages except home and the shop (products) landing page
   const showBack = currentPage !== "home" && currentPage !== "products";
 
+  // --- Swipe between main bottom-nav pages ---
+  const SWIPE_ORDER = ["home", "products", "orders", "account", "cart"];
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
+
+  const onContentTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    swipeStart.current = { x: t.clientX, y: t.clientY };
+  };
+  const onContentTouchEnd = (e: React.TouchEvent) => {
+    if (!swipeStart.current) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - swipeStart.current.x;
+    const dy = t.clientY - swipeStart.current.y;
+    swipeStart.current = null;
+
+    // Only act on a clear horizontal swipe (ignore vertical scrolling)
+    const H_THRESHOLD = 70;
+    if (Math.abs(dx) < H_THRESHOLD || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+
+    // Only swipe between the main tab pages
+    const idx = SWIPE_ORDER.indexOf(currentPage);
+    if (idx === -1) return;
+
+    if (dx < 0) {
+      // swipe left -> next page
+      const next = SWIPE_ORDER[idx + 1];
+      if (next) handleNavigate(next);
+    } else {
+      // swipe right -> previous page
+      const prev = SWIPE_ORDER[idx - 1];
+      if (prev) handleNavigate(prev);
+    }
+  };
+
   return (
     <>
       <Navbar currentPage={currentPage} onNavigate={handleNavigate} />
@@ -237,7 +271,7 @@ function GatedApp() {
         </div>
       )}
       {/* Bottom padding so content isn't hidden behind bottom nav */}
-      <div className="pb-20">
+      <div className="pb-20" onTouchStart={onContentTouchStart} onTouchEnd={onContentTouchEnd}>
         {renderPage()}
       </div>
       <BottomNav currentPage={currentPage} onNavigate={handleNavigate} />

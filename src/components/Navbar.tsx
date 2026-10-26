@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -57,10 +58,16 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
     };
   }, [accountMenuOpen]);
 
+  // Lock background scroll while the mobile drawer is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [mobileMenuOpen]);
+
   const initial = (user?.displayName || user?.email || "U").charAt(0).toUpperCase();
-  const whatsappUrl =
-    "https://wa.me/919346630240?text=" +
-    encodeURIComponent("Hi The House Of Gnapakam! I'd like to order.");
 
   const isMenuActive = (target: string) => {
     if (target === "home") return currentPage === "home";
@@ -184,87 +191,8 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
                 </div>
               )}
 
-              {/* CTA */}
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:inline-flex items-center gap-1 ml-1 px-4 py-2 rounded-full bg-gradient-to-r from-[#F8C8DC] to-[#FBD9A0] text-[#5A2E4A] text-sm font-semibold shadow hover:shadow-lg transition-all"
-              >
-                Order ↗
-              </a>
             </div>
           </div>
-
-          {/* Mobile dropdown menu */}
-          {mobileMenuOpen && (
-            <div className="lg:hidden pb-3 border-t border-white/15 mt-1 pt-2">
-              {/* Account header */}
-              {user ? (
-                <button
-                  onClick={() => { onNavigate("account"); setMobileMenuOpen(false); }}
-                  className="w-full flex items-center gap-3 px-2 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 transition-colors mb-2"
-                >
-                  <span className="w-10 h-10 rounded-full bg-white/90 text-[#2C6E8F] font-bold flex items-center justify-center flex-shrink-0">
-                    {initial}
-                  </span>
-                  <span className="min-w-0 text-left">
-                    <span className="block text-[11px] text-[#FCE3EC] uppercase tracking-wide">Your Account</span>
-                    <span className="block text-sm font-semibold text-white truncate">{user.displayName || "My Account"}</span>
-                    <span className="block text-xs text-white/70 truncate">{user.email}</span>
-                  </span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => { onNavigate("login"); setMobileMenuOpen(false); }}
-                  className="w-full flex items-center gap-3 px-2 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 transition-colors mb-2 text-left"
-                >
-                  <span className="w-10 h-10 rounded-full bg-white/90 text-[#2C6E8F] font-bold flex items-center justify-center flex-shrink-0">👤</span>
-                  <span>
-                    <span className="block text-sm font-semibold text-white">Login / Sign Up</span>
-                    <span className="block text-xs text-white/70">Access your account</span>
-                  </span>
-                </button>
-              )}
-
-              <div className="flex flex-col">
-                {MENU.map((m) => (
-                  <button
-                    key={m.label}
-                    onClick={() => { onNavigate(m.target); setMobileMenuOpen(false); }}
-                    className={`text-left px-2 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                      isMenuActive(m.target) ? "bg-white/15 text-white" : "text-white/85 hover:bg-white/10"
-                    }`}
-                  >
-                    {m.label}
-                  </button>
-                ))}
-
-                {/* Account actions */}
-                {user && (
-                  <div className="mt-2 pt-2 border-t border-white/15 flex flex-col">
-                    <button onClick={() => { onNavigate("account"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">👤 My Account</button>
-                    <button onClick={() => { onNavigate("orders"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">📦 My Orders</button>
-                    <button onClick={() => { onNavigate("addresses"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">📍 Saved Addresses</button>
-                    <button onClick={() => { onNavigate("bank-details"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">📱 UPI Details</button>
-                    {isAdmin(user.email) && (
-                      <button onClick={() => { onNavigate("manager"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">🛠️ Dashboard</button>
-                    )}
-                    <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-[#FFD2D2] hover:bg-white/10 flex items-center gap-2">🚪 Logout</button>
-                  </div>
-                )}
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="mt-2 inline-flex items-center justify-center gap-1 px-4 py-2.5 rounded-full bg-gradient-to-r from-[#F8C8DC] to-[#FBD9A0] text-[#5A2E4A] text-sm font-semibold"
-                >
-                  Order on WhatsApp ↗
-                </a>
-              </div>
-            </div>
-          )}
 
           {/* Search row (always visible) */}
           <div className="pb-2 sm:pb-3">
@@ -272,6 +200,93 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
           </div>
         </div>
       </div>
+
+      {/* Mobile slide-in drawer (from the right) — portaled to body so it always overlays */}
+      {typeof document !== "undefined" && createPortal(
+        <div className={`lg:hidden fixed inset-0 z-[9998] ${mobileMenuOpen ? "" : "pointer-events-none"}`}>
+          {/* Dim overlay — click outside to close */}
+          <div
+            onClick={() => setMobileMenuOpen(false)}
+            className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${mobileMenuOpen ? "opacity-100" : "opacity-0"}`}
+          ></div>
+
+        {/* Panel */}
+        <div
+          className={`absolute right-0 top-0 h-full w-[82%] max-w-xs navbar-bar shadow-2xl transition-transform duration-300 ease-out overflow-y-auto ${
+            mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          <div className="p-4">
+            {/* Close */}
+            <div className="flex justify-end mb-2">
+              <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 text-white" aria-label="Close menu">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Account header */}
+            {user ? (
+              <button
+                onClick={() => { onNavigate("account"); setMobileMenuOpen(false); }}
+                className="w-full flex items-center gap-3 px-2 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 transition-colors mb-3"
+              >
+                <span className="w-11 h-11 rounded-full bg-white/90 text-[#2C6E8F] font-bold flex items-center justify-center flex-shrink-0">
+                  {initial}
+                </span>
+                <span className="min-w-0 text-left">
+                  <span className="block text-[11px] text-[#FCE3EC] uppercase tracking-wide">Your Account</span>
+                  <span className="block text-sm font-semibold text-white truncate">{user.displayName || "My Account"}</span>
+                  <span className="block text-xs text-white/70 truncate">{user.email}</span>
+                </span>
+              </button>
+            ) : (
+              <button
+                onClick={() => { onNavigate("login"); setMobileMenuOpen(false); }}
+                className="w-full flex items-center gap-3 px-2 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 transition-colors mb-3 text-left"
+              >
+                <span className="w-11 h-11 rounded-full bg-white/90 text-[#2C6E8F] font-bold flex items-center justify-center flex-shrink-0">👤</span>
+                <span>
+                  <span className="block text-sm font-semibold text-white">Login / Sign Up</span>
+                  <span className="block text-xs text-white/70">Access your account</span>
+                </span>
+              </button>
+            )}
+
+            {/* Menu links */}
+            <div className="flex flex-col">
+              {MENU.map((m) => (
+                <button
+                  key={m.label}
+                  onClick={() => { onNavigate(m.target); setMobileMenuOpen(false); }}
+                  className={`text-left px-2 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    isMenuActive(m.target) ? "bg-white/15 text-white" : "text-white/85 hover:bg-white/10"
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Account actions */}
+            {user && (
+              <div className="mt-3 pt-3 border-t border-white/15 flex flex-col">
+                <button onClick={() => { onNavigate("account"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">👤 My Account</button>
+                <button onClick={() => { onNavigate("orders"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">📦 My Orders</button>
+                <button onClick={() => { onNavigate("addresses"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">📍 Saved Addresses</button>
+                <button onClick={() => { onNavigate("bank-details"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">📱 UPI Details</button>
+                {isAdmin(user.email) && (
+                  <button onClick={() => { onNavigate("manager"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">🛠️ Dashboard</button>
+                )}
+                <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-[#FFD2D2] hover:bg-white/10 flex items-center gap-2">🚪 Logout</button>
+              </div>
+            )}
+          </div>
+        </div>
+        </div>,
+        document.body
+      )}
     </nav>
   );
 }
