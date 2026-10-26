@@ -108,16 +108,12 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
               </div>
             </div>
 
-            {/* CENTER: logo + name */}
+            {/* CENTER: brand name (one line, no logo) */}
             <button
               onClick={() => onNavigate("home")}
-              className="flex items-center gap-2 flex-shrink-0 px-2"
+              className="flex-shrink-0 px-2"
             >
-              <img src="/images/House_of_gnapakam_logo.jpeg" alt="Logo" className="h-9 sm:h-11 w-auto object-contain drop-shadow" />
-              <div className="flex flex-col items-center leading-none">
-                <span className="text-[8px] sm:text-[10px] font-elegant tracking-[0.3em] text-[#FCE3EC] font-semibold uppercase">The House Of</span>
-                <span className="navbar-brand text-base sm:text-2xl whitespace-nowrap">Gnapakam</span>
-              </div>
+              <span className="navbar-brand text-lg sm:text-3xl whitespace-nowrap">The House Of Gnapakam</span>
             </button>
 
             {/* RIGHT: wishlist + cart + CTA (+ profile on desktop) */}
