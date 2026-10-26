@@ -61,30 +61,87 @@ export function getRelatedProducts(allProducts: Product[], product: Product): Pr
 }
 
 // Smart search with relevance scoring
+// Synonyms / extra keywords so natural words map to the right products.
+// Keyed by a word the customer might type/say; value = keywords that, if present
+// in a product's name/category/group, should match.
+const SEARCH_SYNONYMS: Record<string, string[]> = {
+  horse: ["horse", "rakhi", "raksha"],
+  horses: ["horse", "rakhi"],
+  rakhi: ["rakhi", "horse", "raksha", "combo"],
+  raksha: ["rakhi", "horse", "raksha"],
+  combo: ["combo", "horse", "letter"],
+  letter: ["combo", "letter", "horse"],
+  flower: ["bouquet", "flower", "rose", "sunflower", "pipe"],
+  flowers: ["bouquet", "flower", "rose", "sunflower", "pipe"],
+  bouquet: ["bouquet", "flower", "rose", "sunflower"],
+  boquet: ["bouquet", "flower", "rose"],
+  rose: ["rose", "satin", "bouquet"],
+  satin: ["satin", "ribbon", "rose"],
+  sunflower: ["sunflower", "bouquet"],
+  pipe: ["pipe", "cleaner", "bouquet"],
+  mug: ["cup", "coffee", "mug"],
+  cup: ["cup", "coffee", "magic", "mug"],
+  coffee: ["coffee", "cup", "mug"],
+  magic: ["magic", "cup"],
+  bangle: ["resin", "bangle"],
+  bangles: ["resin", "bangle"],
+  resin: ["resin", "bangle"],
+  magnet: ["magnet", "fridge"],
+  magnets: ["magnet", "fridge"],
+  card: ["card", "birthday"],
+  hamper: ["hamper", "birthday"],
+  magazine: ["magazine"],
+  birthday: ["birthday", "card", "hamper", "magazine"],
+  photo: ["portrait", "photo", "magazine"],
+  portrait: ["portrait", "photo"],
+  gift: ["gift", "hamper", "card", "cup", "combo"],
+  gifts: ["gift", "hamper", "card", "cup"],
+};
+
+// Build the searchable text blob for a product (name + category + group + desc + keywords)
+function productText(p: any): string {
+  return [p.name, p.category, p.group, p.description]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+// Smart, forgiving search: tokenizes the query, applies synonyms, and matches
+// partial words so "horse", "flower", "mug", "rakhi" etc. all find products.
 export function searchProducts(allProducts: Product[], query: string): Product[] {
   if (!query.trim()) return [];
 
-  const q = query.toLowerCase().trim();
+  const raw = query.toLowerCase().trim();
+  // Split into words, drop tiny filler words
+  const words = raw
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length >= 2 && !["the", "and", "for", "a", "an", "of", "in", "my"].includes(w));
+
+  if (words.length === 0) words.push(raw);
 
   return allProducts
     .map((p) => {
-      let score = 0;
+      const text = productText(p);
       const name = p.name.toLowerCase();
-      const category = p.category.toLowerCase();
-      const desc = p.description.toLowerCase();
+      let score = 0;
 
-      // Exact name match
-      if (name === q) score += 100;
-      // Name starts with query
-      else if (name.startsWith(q)) score += 50;
-      // Name contains query
-      else if (name.includes(q)) score += 30;
-      // Category matches
-      if (category.includes(q)) score += 20;
-      // Word in name starts with query
-      if (name.split(" ").some((word) => word.startsWith(q))) score += 15;
-      // Description contains query
-      if (desc.includes(q)) score += 5;
+      // Whole-query boosts
+      if (name === raw) score += 100;
+      else if (name.startsWith(raw)) score += 50;
+      else if (name.includes(raw)) score += 30;
+
+      // Per-word matching (partial / contains)
+      for (const w of words) {
+        if (name.includes(w)) score += 20;
+        else if (text.includes(w)) score += 10;
+
+        // Synonym expansion — match related keywords in the product text
+        const syns = SEARCH_SYNONYMS[w];
+        if (syns && syns.some((s) => text.includes(s))) score += 15;
+
+        // Loose match: word is a prefix of any word in the text
+        if (text.split(/\s+/).some((t) => t.startsWith(w))) score += 8;
+      }
 
       return { product: p, score };
     })

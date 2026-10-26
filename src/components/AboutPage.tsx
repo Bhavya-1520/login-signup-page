@@ -1,16 +1,17 @@
 "use client";
+import Reveal from "./Reveal";
 
 export default function AboutPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div className="text-center mb-12">
+      <Reveal className="text-center mb-12">
         <h1 className="font-display text-2xl sm:text-4xl font-bold text-[#2C1810]">
           About The House Of Gnapakam
         </h1>
         <p className="text-[#D4A574] mt-2 font-medium">Handcrafted with love, designed to last</p>
-      </div>
+      </Reveal>
 
-      <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-sm space-y-8">
+      <Reveal variant="up" delay={100} as="div" className="bg-white rounded-3xl p-8 sm:p-12 shadow-sm space-y-8">
         <div className="text-center">
           <span className="text-6xl">🌸</span>
         </div>
@@ -49,7 +50,7 @@ export default function AboutPage() {
             </ul>
           </div>
         </div>
-      </div>
+      </Reveal>
     </div>
   );
 }

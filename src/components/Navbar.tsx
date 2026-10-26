@@ -12,13 +12,6 @@ interface NavbarProps {
   onNavigate: (page: string) => void;
 }
 
-const categories = [
-  { label: "ALL", image: "/images/ALL.jpeg", group: "All" },
-  { label: "BOQUETS", image: "/images/Boquets.jpeg", group: "Bouquets" },
-  { label: "RAKHI", image: "/images/Rakhi.jpeg", group: "Rakhi" },
-  { label: "RESINARTS", image: "/images/Resin.jpeg", group: "Resin" },
-  { label: "BIRTHDAYGIFTS", image: "/images/BirthdayGifts.jpeg", group: "Birthday" },
-];
 
 export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
   const { totalItems } = useCart();
@@ -123,21 +116,6 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
           <SearchBar onNavigate={onNavigate} compact />
         </div>
 
-        {/* Category strip — 5 items across one line, edge to edge */}
-        <div className="flex pb-2">
-          {categories.map((c) => (
-            <button
-              key={c.label}
-              onClick={() => onNavigate(c.group === "All" ? "products" : `category-${c.group}`)}
-              className="flex flex-col items-center gap-1 flex-1 min-w-0"
-            >
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden ring-2 ring-[#F8C8DC]/50 shadow-sm">
-                <img src={c.image} alt={c.label} className="w-full h-full object-cover" />
-              </div>
-              <span className="text-[9px] sm:text-[10px] font-medium text-gray-600 text-center leading-tight truncate w-full">{c.label}</span>
-            </button>
-          ))}
-        </div>
       </div>
     </nav>
   );

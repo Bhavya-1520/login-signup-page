@@ -130,3 +130,144 @@ body {
   color: #7A2E52; /* solid dark fallback where gradient clip is unsupported */
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
+
+/* ---------------- Splash / intro screen ---------------- */
+@keyframes splashPop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.splash-pop { animation: splashPop 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes splashRise {
+  0% { transform: translateY(14px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+.splash-rise { animation: splashRise 0.8s ease-out 0.3s both; }
+
+@keyframes splashRing {
+  0% { box-shadow: 0 0 0 0 rgba(137,196,225,0.5); }
+  100% { box-shadow: 0 0 0 26px rgba(137,196,225,0); }
+}
+.splash-ring { animation: splashRing 1.6s ease-out infinite; }
+
+@keyframes splashBar {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+.splash-bar { animation: splashBar 2s ease-in-out both; }
+
+@keyframes splashFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+.splash-float { animation: splashFloat 3.5s ease-in-out infinite; }
+.splash-float-slow { animation: splashFloat 5s ease-in-out infinite; }
+
+/* ---------------- Smooth scroll + reveal-on-scroll ---------------- */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Elements start hidden + shifted, then animate in when revealed */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Directional variants */
+.reveal-left { transform: translateX(-32px); }
+.reveal-left.reveal-visible { transform: translateX(0); }
+.reveal-right { transform: translateX(32px); }
+.reveal-right.reveal-visible { transform: translateX(0); }
+.reveal-scale { transform: scale(0.94); }
+.reveal-scale.reveal-visible { transform: scale(1); }
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal, .reveal-left, .reveal-right, .reveal-scale {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------------- Arched category cards (Shop by Collection) ---------------- */
+.arch-card {
+  position: relative;
+  border-radius: 140px 140px 28px 28px; /* tall arch top, soft bottom */
+  overflow: hidden;
+  aspect-ratio: 3 / 5;
+  box-shadow: 0 10px 30px rgba(94, 174, 212, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease;
+}
+.arch-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 45px rgba(94, 174, 212, 0.32);
+}
+.arch-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.arch-card:hover img {
+  transform: scale(1.06);
+}
+/* Darker overlay so the white text + labels highlight nicely */
+.arch-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(44, 24, 16, 0.05) 0%,
+    rgba(30, 110, 150, 0.15) 45%,
+    rgba(30, 60, 90, 0.82) 100%
+  );
+}
+
+/* ---------------- Scrolling marquee strip ---------------- */
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  background: linear-gradient(90deg, #5EAED4 0%, #89C4E1 25%, #E8A0BF 55%, #C77DA5 100%);
+  box-shadow: inset 0 1px 6px rgba(0,0,0,0.08);
+}
+.marquee-track {
+  display: inline-flex;
+  align-items: center;
+  animation: marqueeScroll 22s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 1.25rem;
+  color: #ffffff;
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+.marquee-star { color: #FFE9A8; }
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}

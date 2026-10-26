@@ -6,6 +6,7 @@ import { getProducts, categoryToGroup } from "@/lib/productsDB";
 import { getInventoryMap, isEntryOutOfStock, InventoryMap } from "@/lib/inventory";
 import { getProductRatings, RatingSummary } from "@/lib/orders";
 import ProductCard from "./ProductCard";
+import Reveal from "./Reveal";
 
 // Display groups with friendly labels
 const GROUP_FILTERS = [
@@ -105,15 +106,15 @@ export default function ProductsPage({ onNavigate, initialCategory }: ProductsPa
       {/* Products - Pinterest Masonry Layout */}
       {!loading && (
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-          {filteredProducts.map((product) => (
-            <div key={product.id} className="break-inside-avoid mb-6">
+          {filteredProducts.map((product, idx) => (
+            <Reveal key={product.id} variant="up" delay={(idx % 3) * 90} className="break-inside-avoid mb-6">
               <ProductCard
                 product={product}
                 onNavigate={onNavigate}
                 outOfStock={isEntryOutOfStock(inventory[product.id])}
                 rating={ratings[product.id]}
               />
-            </div>
+            </Reveal>
           ))}
         </div>
       )}

@@ -22,7 +22,9 @@ export default function SearchBar({ onNavigate, compact }: SearchBarProps) {
 
   useEffect(() => {
     getProducts().then((dbProducts) => {
-      if (dbProducts.length > 0) setProducts(dbProducts);
+      const dbIds = new Set(dbProducts.map((p) => p.id));
+      const merged = [...dbProducts, ...fallbackProducts.filter((p) => !dbIds.has(p.id))];
+      if (merged.length > 0) setProducts(merged);
     }).catch(() => {});
   }, []);
 

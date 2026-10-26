@@ -19,7 +19,10 @@ export default function SearchResultsPage({ query: initialQuery, onNavigate }: S
   useEffect(() => {
     getProducts()
       .then((dbProducts) => {
-        if (dbProducts.length > 0) setProducts(dbProducts);
+        // Merge DB products with built-in ones (avoid id duplicates) so everything is searchable
+        const dbIds = new Set(dbProducts.map((p) => p.id));
+        const merged = [...dbProducts, ...fallbackProducts.filter((p) => !dbIds.has(p.id))];
+        setProducts(merged.length > 0 ? merged : fallbackProducts);
         setLoading(false);
       })
       .catch(() => setLoading(false));

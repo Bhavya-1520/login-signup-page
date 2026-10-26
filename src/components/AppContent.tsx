@@ -23,6 +23,7 @@ import BottomNav from "./BottomNav";
 import WishlistPage from "./WishlistPage";
 import ImageSearchPage from "./ImageSearchPage";
 import ReviewsPage from "./ReviewsPage";
+import SplashScreen from "./SplashScreen";
 
 // Map internal page ids to URL path segments
 function pageToPath(page: string): string {
@@ -245,10 +246,25 @@ function GatedApp() {
 }
 
 export default function AppContent() {
+  // Show the branded splash once when the site is first opened (per tab session)
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && sessionStorage.getItem("splashShown")) {
+      setShowSplash(false);
+    }
+  }, []);
+
+  const finishSplash = () => {
+    try { sessionStorage.setItem("splashShown", "1"); } catch {}
+    setShowSplash(false);
+  };
+
   return (
     <AuthProvider>
       <CartProvider>
         <WishlistProvider>
+          {showSplash && <SplashScreen onDone={finishSplash} />}
           <GatedApp />
         </WishlistProvider>
       </CartProvider>

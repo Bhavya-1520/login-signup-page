@@ -11,6 +11,7 @@ import { getInventory, stockFromEntry, InventoryEntry } from "@/lib/inventory";
 import { getAllReviews, PublicReview } from "@/lib/orders";
 import ProductCard from "./ProductCard";
 import PhotoUploader from "./PhotoUploader";
+import Reveal from "./Reveal";
 
 interface ProductDetailProps {
   productId: string;
@@ -565,7 +566,7 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
 
       {/* You may also like (Related Products) */}
       {/* Product Reviews */}
-      <div className="mt-16">
+      <Reveal as="div" className="mt-16">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-display text-2xl font-bold text-[#2C1810]">
             Customer Reviews
@@ -617,10 +618,10 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
             ))}
           </div>
         )}
-      </div>
+      </Reveal>
 
       {relatedProducts.length > 0 && (
-        <div className="mt-16">
+        <Reveal as="div" className="mt-16">
           <h2 className="font-display text-2xl font-bold text-[#2C1810] mb-6 text-center">
             You May Also Like 💝
           </h2>
@@ -629,7 +630,7 @@ export default function ProductDetail({ productId, onNavigate }: ProductDetailPr
               <ProductCard key={rp.id} product={rp} onNavigate={onNavigate} />
             ))}
           </div>
-        </div>
+        </Reveal>
       )}
     </div>
   );
