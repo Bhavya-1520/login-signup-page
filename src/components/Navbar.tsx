@@ -73,14 +73,13 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
       {/* Main bar — deep pastel gradient */}
       <div className="navbar-bar">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          {/* Top row */}
-          <div className="relative flex items-center justify-between gap-2 py-2 sm:py-3">
-            {/* LEFT: hamburger (mobile) + desktop menu links */}
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              {/* Hamburger — mobile/tablet only */}
+          {/* Top row: hamburger (mobile) + brand name + icons */}
+          <div className="flex items-center justify-between gap-2 py-2 sm:py-3">
+            {/* LEFT: hamburger (mobile only) */}
+            <div className="flex items-center flex-shrink-0 lg:flex-1">
               <button
                 onClick={() => setMobileMenuOpen((v) => !v)}
-                className="lg:hidden p-1.5 text-white flex-shrink-0"
+                className="lg:hidden p-1.5 text-white"
                 aria-label="Menu"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -91,33 +90,18 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
                   )}
                 </svg>
               </button>
-
-              {/* Desktop menu links (left side) */}
-              <div className="hidden lg:flex items-center gap-4 xl:gap-6">
-                {MENU.map((m) => (
-                  <button
-                    key={m.label}
-                    onClick={() => onNavigate(m.target)}
-                    className={`text-sm font-medium tracking-wide whitespace-nowrap transition-colors ${
-                      isMenuActive(m.target) ? "text-white" : "text-white/75 hover:text-white"
-                    }`}
-                  >
-                    {m.label}
-                  </button>
-                ))}
-              </div>
             </div>
 
-            {/* CENTER: brand name (one line, no logo) */}
+            {/* CENTER (mobile) / LEFT-aligned brand (laptop) */}
             <button
               onClick={() => onNavigate("home")}
-              className="flex-shrink-0 px-2"
+              className="flex-shrink-0 px-2 lg:flex-none"
             >
-              <span className="navbar-brand text-lg sm:text-3xl whitespace-nowrap">The House Of Gnapakam</span>
+              <span className="navbar-brand text-lg sm:text-2xl lg:text-3xl whitespace-nowrap">The House Of Gnapakam</span>
             </button>
 
-            {/* RIGHT: wishlist + cart + CTA (+ profile on desktop) */}
-            <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0 justify-end">
+            {/* RIGHT: wishlist + cart + profile */}
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 lg:flex-1 justify-end">
               <button onClick={() => onNavigate("wishlist")} className="relative p-1.5 text-white/90 hover:text-[#FCE3EC]" title="Wishlist">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6" fill={wishlistCount > 0 ? "#FCE3EC" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
@@ -165,6 +149,21 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
               )}
 
             </div>
+          </div>
+
+          {/* Desktop menu links row (laptop/tablet only) */}
+          <div className="hidden lg:flex items-center justify-center gap-6 xl:gap-8 pb-2 border-t border-white/10 pt-2">
+            {MENU.map((m) => (
+              <button
+                key={m.label}
+                onClick={() => onNavigate(m.target)}
+                className={`text-sm font-medium tracking-wide whitespace-nowrap transition-colors ${
+                  isMenuActive(m.target) ? "text-white" : "text-white/75 hover:text-white"
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
           </div>
 
           {/* Search row (always visible) */}

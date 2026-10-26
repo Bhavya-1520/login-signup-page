@@ -281,13 +281,13 @@ html {
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-/* Brand name on the dark bar — light, elegant */
+/* Brand name on the dark bar — elegant script-like serif */
 .navbar-brand {
-  font-family: 'Playfair Display', serif;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   color: #ffffff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
 }
 
 /* Top announcement marquee */
