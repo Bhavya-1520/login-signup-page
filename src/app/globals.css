@@ -274,3 +274,56 @@ html {
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { animation: none; }
 }
+
+/* ---------------- Monark-style navbar (deep pastel) ---------------- */
+.navbar-bar {
+  background: linear-gradient(120deg, #2C6E8F 0%, #3E7FA6 35%, #7A5A86 70%, #9C5C84 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Brand name on the dark bar — light, elegant */
+.navbar-brand {
+  font-family: 'Playfair Display', serif;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* Top announcement marquee */
+.navbar-marquee {
+  overflow: hidden;
+  background: linear-gradient(90deg, #1E4E66 0%, #3E7FA6 50%, #6E3F63 100%);
+}
+.navbar-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: navbarMarquee 28s linear infinite;
+}
+.navbar-marquee:hover .navbar-marquee-track {
+  animation-play-state: paused;
+}
+.navbar-marquee-group {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+.navbar-marquee-word {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 1rem;
+  white-space: nowrap;
+  color: #FCE3EC;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.navbar-marquee-star { color: #FBD9A0; }
+@keyframes navbarMarquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .navbar-marquee-track { animation: none; }
+}

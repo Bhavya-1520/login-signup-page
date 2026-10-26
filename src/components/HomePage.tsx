@@ -84,16 +84,16 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               Shop Your Handcrafts <span className="brand-name">through our collections</span>
             </h2>
             <p className="text-gray-600 mt-3 max-w-xl text-sm sm:text-base">
-              Four handcrafted worlds, one standard — pieces made with love, built to last forever.
+              Handcrafted worlds, one standard — pieces made with love, built to last forever.
             </p>
           </Reveal>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { n: "01", label: "Bouquets", sub: "Flowers that last forever", group: "Bouquets", image: "/images/satin boquet.png" },
-              { n: "02", label: "Rakhi Gifts", sub: "Decorated horses & combos", group: "Rakhi", image: "/images/Horse+Letter.jpeg" },
-              { n: "03", label: "Resin Arts", sub: "Elegant resin bangles", group: "Resin", image: "/images/Resin Bangle.jpeg" },
-              { n: "04", label: "Birthday Gifts", sub: "Cards, hampers & cups", group: "Birthday", image: "/images/BirthdayHamper.jpeg" },
+              { label: "Bouquets", sub: "Flowers that last forever", group: "Bouquets", image: "/images/satin boquet.png" },
+              { label: "Rakhi Gifts", sub: "Decorated horses & combos", group: "Rakhi", image: "/images/Horse+Letter.jpeg" },
+              { label: "Resin Arts", sub: "Elegant resin bangles", group: "Resin", image: "/images/Resin Bangle.jpeg" },
+              { label: "Birthday Gifts", sub: "Cards, hampers & cups", group: "Birthday", image: "/images/BirthdayHamper.jpeg" },
             ].map((c, idx) => (
               <Reveal key={c.group} variant="up" delay={idx * 110}>
                 <button
@@ -103,7 +103,6 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   <img src={c.image} alt={c.label} />
                   <div className="arch-overlay"></div>
                   <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 text-white">
-                    <p className="text-[10px] sm:text-xs tracking-[0.2em] text-white/80 mb-1">{c.n}</p>
                     <h3 className="font-display text-lg sm:text-2xl font-bold leading-tight">{c.label}</h3>
                     <p className="text-[10px] sm:text-xs text-white/85 mt-0.5 mb-2">{c.sub}</p>
                     <span className="inline-flex items-center gap-1 text-[11px] sm:text-sm font-semibold tracking-wide">

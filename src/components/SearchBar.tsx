@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { products as fallbackProducts } from "@/lib/products";
 import { getProducts } from "@/lib/productsDB";
 import { searchProducts } from "@/lib/recommendations";
@@ -238,38 +239,48 @@ export default function SearchBar({ onNavigate, compact }: SearchBarProps) {
       />
 
       {/* Image search choice menu */}
-      {showImageMenu && (
-        <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-[60]" onClick={() => setShowImageMenu(false)}>
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl p-5 w-full sm:max-w-xs" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-center font-semibold text-[#2C1810] mb-4">Search by Image</h3>
+      {showImageMenu && typeof document !== "undefined" && createPortal(
+        <div
+          className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-[9999] p-4"
+          onClick={() => setShowImageMenu(false)}
+        >
+          <div
+            className="bg-white rounded-3xl p-5 w-full max-w-sm shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-center font-semibold text-[#2C1810] text-base mb-4">Search by Image</h3>
+
             <button
               onClick={() => cameraInputRef.current?.click()}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-sky-50 text-left"
             >
-              <span className="text-2xl">📷</span>
-              <div>
+              <span className="text-2xl flex-shrink-0">📷</span>
+              <div className="min-w-0">
                 <p className="text-sm font-medium text-[#2C1810]">Take a Photo</p>
                 <p className="text-xs text-gray-400">Use your camera</p>
               </div>
             </button>
+
             <button
               onClick={() => galleryInputRef.current?.click()}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-sky-50 text-left"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-sky-50 text-left mt-1"
             >
-              <span className="text-2xl">🖼️</span>
-              <div>
+              <span className="text-2xl flex-shrink-0">🖼️</span>
+              <div className="min-w-0">
                 <p className="text-sm font-medium text-[#2C1810]">Upload from Gallery</p>
                 <p className="text-xs text-gray-400">Choose from your photos</p>
               </div>
             </button>
+
             <button
               onClick={() => setShowImageMenu(false)}
-              className="w-full mt-2 py-2.5 text-sm text-gray-500 font-medium"
+              className="w-full mt-3 py-2.5 text-sm text-gray-500 font-medium rounded-2xl hover:bg-gray-50"
             >
               Cancel
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
