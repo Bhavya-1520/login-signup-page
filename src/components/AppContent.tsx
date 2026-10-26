@@ -87,6 +87,8 @@ function GatedApp() {
   const [currentPage, setCurrentPage] = useState("home");
   // Own history stack (reliable for a single-page app)
   const historyRef = useRef<string[]>(["home"]);
+  // Swipe tracking for page navigation (declared with other hooks, before any early return)
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
 
   const handleNavigate = (page: string) => {
     historyRef.current.push(page);
@@ -222,7 +224,6 @@ function GatedApp() {
 
   // --- Swipe between main bottom-nav pages ---
   const SWIPE_ORDER = ["home", "products", "orders", "account", "cart"];
-  const swipeStart = useRef<{ x: number; y: number } | null>(null);
 
   const onContentTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0];
