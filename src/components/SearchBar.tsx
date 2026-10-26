@@ -17,9 +17,12 @@ export default function SearchBar({ onNavigate, compact }: SearchBarProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showImageMenu, setShowImageMenu] = useState(false);
   const [listening, setListening] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     getProducts().then((dbProducts) => {
@@ -239,7 +242,7 @@ export default function SearchBar({ onNavigate, compact }: SearchBarProps) {
       />
 
       {/* Image search choice menu */}
-      {showImageMenu && typeof document !== "undefined" && createPortal(
+      {showImageMenu && mounted && createPortal(
         <div
           className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-[9999] p-4"
           onClick={() => setShowImageMenu(false)}

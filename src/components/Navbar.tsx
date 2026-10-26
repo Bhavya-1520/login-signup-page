@@ -24,24 +24,17 @@ const MENU = [
   { label: "Contact", target: "contact" },
 ];
 
-const MARQUEE_WORDS = [
-  "Handcrafts",
-  "Bouquets",
-  "Rakhi Gifts",
-  "Resin Arts",
-  "Birthday Gifts",
-  "Customised Gifts",
-  "Made with Love",
-  "Order now from House of Gnapakam",
-];
-
 export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
   const { totalItems } = useCart();
   const { count: wishlistCount } = useWishlist();
   const { user, logout } = useAuth();
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
+
+  // Only portal after mount (avoids SSR/hydration mismatch)
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (!accountMenuOpen) return;
@@ -77,22 +70,6 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
 
   return (
     <nav className="sticky top-0 z-50 shadow-md">
-      {/* Top announcement marquee */}
-      <div className="navbar-marquee">
-        <div className="navbar-marquee-track">
-          {[0, 1].map((dup) => (
-            <div key={dup} className="navbar-marquee-group" aria-hidden={dup === 1}>
-              {MARQUEE_WORDS.map((w, i) => (
-                <span key={i} className="navbar-marquee-word">
-                  <span className="navbar-marquee-star">✦</span>
-                  {w}
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Main bar — deep pastel gradient */}
       <div className="navbar-bar">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
@@ -202,7 +179,7 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
       </div>
 
       {/* Mobile slide-in drawer (from the right) — portaled to body so it always overlays */}
-      {typeof document !== "undefined" && createPortal(
+      {mounted && createPortal(
         <div className={`lg:hidden fixed inset-0 z-[9998] ${mobileMenuOpen ? "" : "pointer-events-none"}`}>
           {/* Dim overlay — click outside to close */}
           <div
