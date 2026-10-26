@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { useCart } from "@/context/CartContext";
 
 interface BottomNavProps {
@@ -9,6 +10,7 @@ interface BottomNavProps {
 
 export default function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
   const { totalItems } = useCart();
+  const touchStartX = useRef<number | null>(null);
 
   const isActive = (page: string) => {
     if (page === "home") return currentPage === "home";
@@ -65,8 +67,35 @@ export default function BottomNav({ currentPage, onNavigate }: BottomNavProps) {
     },
   ];
 
+  // Which tab is currently active (for swipe stepping)
+  const currentIndex = items.findIndex((it) => isActive(it.id));
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    const threshold = 45;
+    const base = currentIndex === -1 ? 0 : currentIndex;
+    if (diff <= -threshold) {
+      // swipe left → next tab
+      const next = Math.min(items.length - 1, base + 1);
+      if (next !== base) onNavigate(items[next].id);
+    } else if (diff >= threshold) {
+      // swipe right → previous tab
+      const prev = Math.max(0, base - 1);
+      if (prev !== base) onNavigate(items[prev].id);
+    }
+    touchStartX.current = null;
+  };
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+    <div
+      className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
       <div className="max-w-lg mx-auto flex items-center justify-around px-2 py-1.5">
         {items.map((item) => {
           const active = isActive(item.id);

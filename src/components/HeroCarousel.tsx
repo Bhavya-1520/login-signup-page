@@ -43,10 +43,13 @@ export default function HeroCarousel({ onNavigate }: HeroCarouselProps) {
   const [current, setCurrent] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const touchMoved = useRef(false);
+  // When the user swipes manually, pause auto-advance briefly so it doesn't snap back
+  const pausedUntil = useRef(0);
 
-  // Auto-slide every 4 seconds
+  // Auto-slide every 4 seconds (skips while recently swiped)
   useEffect(() => {
     const timer = setInterval(() => {
+      if (Date.now() < pausedUntil.current) return;
       setCurrent((prev) => (prev + 1) % slides.length);
     }, 4000);
     return () => clearInterval(timer);
@@ -73,9 +76,11 @@ export default function HeroCarousel({ onNavigate }: HeroCarouselProps) {
     if (diff <= -threshold) {
       // swiped left → show next (right-side) photo
       setCurrent((c) => (c + 1) % slides.length);
+      pausedUntil.current = Date.now() + 6000;
     } else if (diff >= threshold) {
       // swiped right → show previous (left-side) photo
       setCurrent((c) => (c - 1 + slides.length) % slides.length);
+      pausedUntil.current = Date.now() + 6000;
     }
     touchStartX.current = null;
   };
