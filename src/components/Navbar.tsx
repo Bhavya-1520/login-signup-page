@@ -199,6 +199,34 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
           {/* Mobile dropdown menu */}
           {mobileMenuOpen && (
             <div className="lg:hidden pb-3 border-t border-white/15 mt-1 pt-2">
+              {/* Account header */}
+              {user ? (
+                <button
+                  onClick={() => { onNavigate("account"); setMobileMenuOpen(false); }}
+                  className="w-full flex items-center gap-3 px-2 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 transition-colors mb-2"
+                >
+                  <span className="w-10 h-10 rounded-full bg-white/90 text-[#2C6E8F] font-bold flex items-center justify-center flex-shrink-0">
+                    {initial}
+                  </span>
+                  <span className="min-w-0 text-left">
+                    <span className="block text-[11px] text-[#FCE3EC] uppercase tracking-wide">Your Account</span>
+                    <span className="block text-sm font-semibold text-white truncate">{user.displayName || "My Account"}</span>
+                    <span className="block text-xs text-white/70 truncate">{user.email}</span>
+                  </span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => { onNavigate("login"); setMobileMenuOpen(false); }}
+                  className="w-full flex items-center gap-3 px-2 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 transition-colors mb-2 text-left"
+                >
+                  <span className="w-10 h-10 rounded-full bg-white/90 text-[#2C6E8F] font-bold flex items-center justify-center flex-shrink-0">👤</span>
+                  <span>
+                    <span className="block text-sm font-semibold text-white">Login / Sign Up</span>
+                    <span className="block text-xs text-white/70">Access your account</span>
+                  </span>
+                </button>
+              )}
+
               <div className="flex flex-col">
                 {MENU.map((m) => (
                   <button
@@ -211,6 +239,20 @@ export default function Navbar({ currentPage, onNavigate }: NavbarProps) {
                     {m.label}
                   </button>
                 ))}
+
+                {/* Account actions */}
+                {user && (
+                  <div className="mt-2 pt-2 border-t border-white/15 flex flex-col">
+                    <button onClick={() => { onNavigate("account"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">👤 My Account</button>
+                    <button onClick={() => { onNavigate("orders"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">📦 My Orders</button>
+                    <button onClick={() => { onNavigate("addresses"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">📍 Saved Addresses</button>
+                    <button onClick={() => { onNavigate("bank-details"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">📱 UPI Details</button>
+                    {isAdmin(user.email) && (
+                      <button onClick={() => { onNavigate("manager"); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-white/85 hover:bg-white/10 flex items-center gap-2">🛠️ Dashboard</button>
+                    )}
+                    <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="text-left px-2 py-2.5 rounded-lg text-sm text-[#FFD2D2] hover:bg-white/10 flex items-center gap-2">🚪 Logout</button>
+                  </div>
+                )}
                 <a
                   href={whatsappUrl}
                   target="_blank"
